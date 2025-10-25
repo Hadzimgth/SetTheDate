@@ -1,0 +1,6 @@
+services:
+  setthedate:
+    image: ${DOCKER_REGISTRY-}setthedate
+    build:
+      context: .
+      dockerfile: SetTheDate/Dockerfile
