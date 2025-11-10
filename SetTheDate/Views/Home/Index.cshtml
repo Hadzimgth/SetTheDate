@@ -2,5 +2,56 @@
     ViewData["Title"] = "Login";
 }
 
-<link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
-<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<div class="container-fluid vh-100 vw-100 p-0">
+    <div class="row g-0 h-100">
+        <!-- Left section -->
+        <div class="col-md-6 d-flex align-items-center justify-content-center text-dark" style="background-color: #AFCBFF;">
+            <div style="max-width: 450px;">
+                <h1 class="fw-bold mb-4">Let <span class="text-primary">SetTheDate</span><br />Help you</h1>
+                <p class="mb-3">Planning a wedding? Here’s why our service might be helpful:</p>
+                <ul>
+                    <li>Automate your invitation process to your guests.</li>
+                    <li>Gather responses seamlessly, including attendance confirmations, guest counts, and even meal preferences.</li>
+                    <li>Personalize your invitations to reflect your style and make your guests feel special.</li>
+                    <li>We even throw in a free landing page for your wedding, Free of Charge!</li>
+                </ul>
+                <p class="mt-3">Register now and explore our service now.</p>
+            </div>
+        </div>
+
+        <!-- Right section -->
+        <div class="col-md-6 d-flex align-items-center justify-content-center bg-white">
+            <div style="width: 350px;">
+                <h5 class="mb-4 fw-semibold text-center">Login</h5>
+                <form>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" placeholder="Email or phone number" />
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <input type="password" class="form-control" placeholder="Enter password" />
+                        <i class="fa-solid fa-eye position-absolute end-0 top-50 translate-middle-y me-3 text-muted" style="cursor: pointer;"></i>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" />
+                            <label class="form-check-label small" for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="small text-decoration-none">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn w-100 text-white" style="background-color: #307CFF;">Sign in</button>
+                </form>
+
+                <div class="text-center my-3 text-muted">or</div>
+
+                <button type="button" class="btn btn-dark w-100 mb-3">
+                    <i class="fa-brands fa-google me-2"></i> Sign in with Google
+                </button>
+
+                <p class="text-center small">
+                    Don't have an account?
+                    <a href="#" class="text-primary text-decoration-none">Sign up now</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,6 +17,26 @@ namespace SetTheDate.Controllers
         {
             return View();
         }
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
+        public IActionResult EventSetup()
+        {
+            return View();
+        }
+        public IActionResult GuestSetup()
+        {
+            return View();
+        }
+        public IActionResult GuestQuestion()
+        {
+            return View();
+        }
+        public IActionResult EventSetupSummary()
+        {
+            return View();
+        }
 
         public IActionResult Privacy()
         {
