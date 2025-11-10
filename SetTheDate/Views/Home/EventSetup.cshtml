@@ -1,0 +1,71 @@
+﻿@{
+    ViewData["Title"] = "Create Event";
+}
+
+<div style="background-color:#a7c8ff; min-height:100vh;">
+    <div class="container py-4">
+        <div class="bg-white p-4 rounded-4 shadow-sm">
+            <h3 class="fw-bold mb-4">Let's get to know your event:</h3>
+
+            <!-- Event Setup Section -->
+            <div class="mb-4">
+                <h5 class="fw-semibold mb-3">Event Setup:</h5>
+
+                <div class="mb-3">
+                    <label for="EventName" class="form-label fw-medium">Event Name</label>
+                    <input type="text" class="form-control" id="EventName" name="EventName" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="EventDescription" class="form-label fw-medium">Event Description</label>
+                    <textarea class="form-control" id="EventDescription" name="EventDescription" rows="3"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="ClosingDate" class="form-label fw-medium">Closing Date For Summary</label>
+                    <input type="date" class="form-control" id="ClosingDate" name="ClosingDate" />
+                </div>
+            </div>
+
+            <!-- E Wedding Card Setup Section -->
+            <div class="mb-4">
+                <h5 class="fw-semibold mb-3">E Wedding Card Setup <span class="text-muted">(skippable):</span></h5>
+
+                <div class="mb-3">
+                    <label for="MaleBride" class="form-label fw-medium">Male Bride</label>
+                    <input type="text" class="form-control" id="MaleBride" name="MaleBride" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="FemaleBride" class="form-label fw-medium">Female Bride</label>
+                    <input type="text" class="form-control" id="FemaleBride" name="FemaleBride" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="MaleBrideFather" class="form-label fw-medium">Male Bride's Father's Name</label>
+                    <input type="text" class="form-control" id="MaleBrideFather" name="MaleBrideFather" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="MaleBrideMother" class="form-label fw-medium">Male Bride's Mother's Name</label>
+                    <input type="text" class="form-control" id="MaleBrideMother" name="MaleBrideMother" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="FemaleBrideFather" class="form-label fw-medium">Female Bride's Father's Name</label>
+                    <input type="text" class="form-control" id="FemaleBrideFather" name="FemaleBrideFather" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="FemaleBrideMother" class="form-label fw-medium">Female Bride's Mother's Name</label>
+                    <input type="text" class="form-control" id="FemaleBrideMother" name="FemaleBrideMother" />
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary px-4">Save Event</button>
+            </div>
+        </div>
+    </div>
+</div>
