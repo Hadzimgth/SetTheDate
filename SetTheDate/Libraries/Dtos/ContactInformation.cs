@@ -1,6 +1,8 @@
-﻿namespace SetTheDate.Models
+﻿using Repository;
+
+namespace SetTheDate.Libraries.Dtos
 {
-    public class ContactInformationModel
+    public class ContactInformation: IEntity
     {
         public int Id { get; set; }
         public int WeddingCardInformationId { get; set; }
