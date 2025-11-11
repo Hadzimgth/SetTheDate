@@ -1,6 +1,8 @@
-﻿namespace SetTheDate.Models
+﻿using Repository;
+
+namespace SetTheDate.Libraries.Dtos
 {
-    public class UserModel
+    public class User : IEntity
     {
         public int Id { get; set; }
         public string Email { get; set; }
