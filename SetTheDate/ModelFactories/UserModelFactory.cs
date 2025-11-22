@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SetTheDate.Libraries.Dtos;
 using SetTheDate.Libraries.Services;
 using SetTheDate.Models;
 
@@ -29,7 +30,20 @@ namespace SetTheDate.ModelFactories
 
             return model;
         }
+        public async Task<UserModel> RegisterUser(RegisterModel registerModel)
+        {
+            var entity = (await _userService.GetAllUser()).Where(x => x.Email == registerModel.Email).FirstOrDefault();
 
+            //throw error user already registered
+
+            var model = _mapper.Map<User>(registerModel);
+
+            var user = await _userService.InsertUser(model);
+
+            var userModel = _mapper.Map<UserModel>(user);
+
+            return userModel;
+        }
 
         public async Task<UserModel> GetEntityByIdAsync(int id)
         {

@@ -21,5 +21,11 @@ namespace SetTheDate.Libraries.Services
         {
             return await _userRepository.GetAllAsync();
         }
+        public async Task<User> InsertUser(User user)
+        {
+            _userRepository.Add(user);
+
+            return (await _userRepository.GetAllAsync()).Where(x => x.Email == user.Email).FirstOrDefault();
+        }
     }
 }

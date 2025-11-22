@@ -41,6 +41,29 @@ namespace SetTheDate.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+        public async Task<IActionResult> Register(RegisterModel model)
+        {
+            var user = await _userModelFactory.ValidateUser(model);
+
+            if (user == null)
+            {
+                ViewBag.Error = "Error";
+                return View();
+            }
+
+            // Store session
+            HttpContext.Session.SetInt32("UserId", user.Id);
+            HttpContext.Session.SetString("UserName", user.Email);
+            HttpContext.Session.SetString("UserIsAdmin", user.IsAdmin.ToString());
+
+            return RedirectToAction("Index", "Home");
+        }
+
         [HttpPost]
         public IActionResult Logout()
         {
