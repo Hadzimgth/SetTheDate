@@ -12,14 +12,23 @@ namespace SetTheDate.Libraries.Services
             _eventImageAttachmentRepository = eventImageAttachmentRepository;
         }
 
-        public async Task<EventImageAttachment> GetEntityById(int id)
+        public async Task<List<EventImageAttachment>> GetImagesByEventWeddingCardIdAsync(int weddingCardId)
         {
-            return await _eventImageAttachmentRepository.GetByIdAsync(id);
-        }
+            var images = await _eventImageAttachmentRepository.GetAllAsync();
 
-        public async Task<IEnumerable<EventImageAttachment>> GetAllEntities()
+            return images.Where(x => x.WeddingCardId == weddingCardId).ToList();
+        }
+        public void InsertImage(EventImageAttachment image)
         {
-            return await _eventImageAttachmentRepository.GetAllAsync();
+            _eventImageAttachmentRepository.Add(image);
+        }
+        public void UpdateImage(EventImageAttachment image)
+        {
+            _eventImageAttachmentRepository.Update(image);
+        }
+        public void DeleteImage(EventImageAttachment image)
+        {
+            _eventImageAttachmentRepository.Delete(image);
         }
     }
 }

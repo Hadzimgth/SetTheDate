@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SetTheDate.Libraries.Dtos;
 using SetTheDate.Libraries.Services;
 using SetTheDate.Models;
 
@@ -16,18 +17,20 @@ namespace SetTheDate.ModelFactories
             _mapper = mapper;
         }
 
-        public async Task<EventImageAttachmentModel> GetEntityByIdAsync(int id)
+        public async Task<List<EventImageAttachmentModel>> GetImagesByWeddingCardIdAsync(int weddingCardId)
         {
-            var entity = await _AttachmentService.GetEntityById(id);
-            var model = _mapper.Map<EventImageAttachmentModel>(entity);
-            return model;
+            var entity = await _AttachmentService.GetImagesByEventWeddingCardIdAsync(weddingCardId);
+            return _mapper.Map<List<EventImageAttachmentModel>>(entity);
         }
 
-        public async Task<IEnumerable<EventImageAttachmentModel>> GetAllEntitiesAsync()
+        public void InsertImageAttachment(List<EventImageAttachmentModel> images, int weddingCardId)
         {
-            var entities = await _AttachmentService.GetAllEntities();
-            var models = _mapper.Map<List<EventImageAttachmentModel>>(entities);
-            return models;
+            foreach (var imageModel in images)
+            {
+                var image = _mapper.Map<EventImageAttachment>(imageModel);
+                image.WeddingCardId = weddingCardId;
+                _AttachmentService.InsertImage(image);
+            }
         }
     }
 }

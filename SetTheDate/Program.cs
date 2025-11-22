@@ -1,10 +1,10 @@
-using SetTheDate.Libraries;
 using AutoMapper;
+using SetTheDate.Libraries;
+//using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllersWithViews();
-builder.Services.AddAutoMapper(typeof(ProfileMapper));
+builder.Services.AddAutoMapper(cfg => { }, typeof(ModelMapper).Assembly);
 
 var app = builder.Build();
 

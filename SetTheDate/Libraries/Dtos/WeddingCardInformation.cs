@@ -19,6 +19,7 @@ namespace SetTheDate.Libraries.Dtos
         public string Postcode { get; set; }
         public string State { get; set; }
         public int EventImageAttachmentId { get; set; }
+        public int WeddingCardType { get; set; }
 
     }
 }

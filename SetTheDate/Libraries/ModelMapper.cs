@@ -4,9 +4,9 @@ using SetTheDate.Models;
 
 namespace SetTheDate.Libraries
 {
-    public class ProfileMapper : Profile
+    public class ModelMapper : Profile
     {
-        public ProfileMapper()
+        public ModelMapper()
         {
             CreateMap<ContactInformation, ContactInformationModel>().ReverseMap();
             CreateMap<ContactInformationModel, ContactInformation>().ReverseMap();

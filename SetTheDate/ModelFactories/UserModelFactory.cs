@@ -18,14 +18,14 @@ namespace SetTheDate.ModelFactories
 
         public async Task<UserModel> GetEntityByIdAsync(int id)
         {
-            var entity = await _userService.GetEntityById(id);
+            var entity = await _userService.GetUserById(id);
             var model = _mapper.Map<UserModel>(entity);
             return model;
         }
 
         public async Task<IEnumerable<UserModel>> GetAllEntitiesAsync()
         {
-            var entities = await _userService.GetAllEntities();
+            var entities = await _userService.GetAllUser();
             var models = _mapper.Map<List<UserModel>>(entities);
             return models;
         }

@@ -2,6 +2,12 @@
 {
     public class WeddingCardInformationModel
     {
+        public WeddingCardInformationModel()
+        {
+            ContactInformations = new List<ContactInformationModel>();
+            EventImages = new List<EventImageAttachmentModel>();
+        }
+
         public int Id { get; set; }
         public int UserEventId { get; set; }
         public string GroomName { get; set; }
@@ -16,7 +22,10 @@
         public string Address3 { get; set; }
         public string Postcode { get; set; }
         public string State { get; set; }
+        public int WeddingCardType { get; set; }
         public int EventImageAttachmentId { get; set; }
+        public List<ContactInformationModel> ContactInformations { get; set; }
+        public List<EventImageAttachmentModel> EventImages { get; set; }
 
     }
 }

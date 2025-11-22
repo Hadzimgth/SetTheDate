@@ -12,12 +12,12 @@ namespace SetTheDate.Libraries.Services
             _userRepository = userRepository;
         }
 
-        public async Task<User> GetEntityById(int id)
+        public async Task<User> GetUserById(int id)
         {
             return await _userRepository.GetByIdAsync(id);
         }
 
-        public async Task<IEnumerable<User>> GetAllEntities()
+        public async Task<IEnumerable<User>> GetAllUser()
         {
             return await _userRepository.GetAllAsync();
         }

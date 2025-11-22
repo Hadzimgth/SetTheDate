@@ -14,14 +14,57 @@ namespace SetTheDate.Libraries.Services
             _weddingCardInformationRepository = weddingCardInformationRepository;
         }
 
-        public async Task<WeddingCardInformation> GetEntityById(int id)
+        public async Task<WeddingCardInformation> GetWeddingCardByEventIdAsync(int eventId)
         {
-            return await _weddingCardInformationRepository.GetByIdAsync(id);
+            var weddingCards = await _weddingCardInformationRepository.GetAllAsync();
+            return weddingCards.FirstOrDefault(x => x.UserEventId == eventId);
+        }
+        public void InsertImage(WeddingCardInformation weddingCardInfo)
+        {
+            _weddingCardInformationRepository.Add(weddingCardInfo);
+        }
+        public void UpdateEvent(WeddingCardInformation weddingCardInfo)
+        {
+            _weddingCardInformationRepository.Update(weddingCardInfo);
+        }
+        public void DeleteEvent(WeddingCardInformation weddingCardInfo)
+        {
+            _weddingCardInformationRepository.Delete(weddingCardInfo);
+        }
+        public async Task<List<GuestWishes>> GetGuestWishesListByWeddingCardInformationId(int weddingCardInformationId)
+        {
+            var wishesList = await _guestWishesRepository.GetAllAsync();
+            return wishesList.Where(x => x.WeddingCardInformationId == weddingCardInformationId).ToList();
+        }
+        public void InsertWishes(GuestWishes wishes)
+        {
+            _guestWishesRepository.Add(wishes);
+        }
+        public void UpdateWishes(GuestWishes wishes)
+        {
+            _guestWishesRepository.Update(wishes);
+        }
+        public void DeleteWishes(GuestWishes wishes)
+        {
+            _guestWishesRepository.Delete(wishes);
         }
 
-        public async Task<IEnumerable<WeddingCardInformation>> GetAllEntities()
+        public async Task<List<ContactInformation>> GetContactInformationListByWeddingCardInformationId(int weddingCardInformationId)
         {
-            return await _weddingCardInformationRepository.GetAllAsync();
+            var contactInformation = await _contactInformationRepository.GetAllAsync();
+            return contactInformation.Where(x => x.WeddingCardInformationId == weddingCardInformationId).ToList();
+        }
+        public void InsertContactInformation(ContactInformation contact)
+        {
+            _contactInformationRepository.Add(contact);
+        }
+        public void UpdateContactInformation(ContactInformation contact)
+        {
+            _contactInformationRepository.Update(contact);
+        }
+        public void DeleteContactInformation(ContactInformation contact)
+        {
+            _contactInformationRepository.Delete(contact);
         }
     }
 }
