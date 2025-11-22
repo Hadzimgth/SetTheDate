@@ -15,6 +15,21 @@ namespace SetTheDate.ModelFactories
             _userService = userService;
             _mapper = mapper;
         }
+        public async Task<UserModel> ValidateUser(LoginModel loginModel)
+        {
+            var entity = (await _userService.GetAllUser()).Where(x => x.Email == loginModel.Email).FirstOrDefault();
+
+            if (entity == null)
+                return null;
+
+            if (!BCrypt.Net.BCrypt.Verify(loginModel.Password, entity.Password))
+                return null;
+
+            var model = _mapper.Map<UserModel>(entity);
+
+            return model;
+        }
+
 
         public async Task<UserModel> GetEntityByIdAsync(int id)
         {
