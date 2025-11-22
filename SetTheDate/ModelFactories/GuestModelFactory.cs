@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SetTheDate.Libraries.Dtos;
 using SetTheDate.Libraries.Services;
 using SetTheDate.Models;
 
@@ -7,27 +8,35 @@ namespace SetTheDate.ModelFactories
     public class GuestModelFactory
     {
         private readonly GuestService _guestService;
+        private readonly AttachmentService _attachmentService;
         private readonly IMapper _mapper;
 
         public GuestModelFactory(GuestService guestService,
-            IMapper mapper)
+            AttachmentService attachmentService, IMapper mapper)
         {
             _guestService = guestService;
+            _attachmentService = attachmentService;
             _mapper = mapper;
         }
 
-        public async Task<WeddingCardInformationModel> GetEntityByIdAsync(int id)
+        public async Task<WeddingCardInformationModel> PrepareWeddingCardByEventIdAsync(int eventId)
         {
-            var entity = await _guestService.GetEntityById(id);
-            var model = _mapper.Map<WeddingCardInformationModel>(entity);
-            return model;
+            var model = await _guestService.GetWeddingCardByEventIdAsync(eventId);
+            var weddingCard =  _mapper.Map<WeddingCardInformationModel>(model);
+
+            var contactInformations = await _guestService.GetContactInformationListByWeddingCardInformationId(weddingCard.Id);
+            var eventImages = await _attachmentService.GetImagesByEventWeddingCardIdAsync(weddingCard.Id);
+
+            weddingCard.ContactInformations = _mapper.Map<List<ContactInformationModel>>(contactInformations);
+            weddingCard.EventImages = _mapper.Map<List<EventImageAttachmentModel>>(eventImages);
+
+            return weddingCard;
         }
 
-        public async Task<IEnumerable<WeddingCardInformationModel>> GetAllEntitiesAsync()
+        public void InsertGuestWishes(GuestWishesModel guestWishesModel)
         {
-            var entities = await _guestService.GetAllEntities();
-            var models = _mapper.Map<List<WeddingCardInformationModel>>(entities);
-            return models;
+            var entity = _mapper.Map<GuestWishes>(guestWishesModel);
+            _guestService.InsertWishes(entity);
         }
     }
 }
