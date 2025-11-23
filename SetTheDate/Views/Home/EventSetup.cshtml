@@ -1,71 +1,177 @@
-﻿@{
+﻿@model UserEventModel
+
+@{
     ViewData["Title"] = "Create Event";
 }
 
-<div style="background-color:#a7c8ff; min-height:100vh;">
-    <div class="container py-4">
-        <div class="bg-white p-4 rounded-4 shadow-sm">
-            <h3 class="fw-bold mb-4">Let's get to know your event:</h3>
 
-            <!-- Event Setup Section -->
-            <div class="mb-4">
-                <h5 class="fw-semibold mb-3">Event Setup:</h5>
+<form asp-action="@(Model.IsEdit ? "Edit" : "Create")" asp-controller="EventController" method="post">
 
-                <div class="mb-3">
-                    <label for="EventName" class="form-label fw-medium">Event Name</label>
-                    <input type="text" class="form-control" id="EventName" name="EventName" />
+    <div style="background-color:#a7c8ff; min-height:100vh;">
+        <div class="container py-4">
+            <div class="bg-white p-4 rounded-4 shadow-sm">
+                <h3 class="fw-bold mb-4">Let's get to know your event:</h3>
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-3">Event Setup:</h5>
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="Id" />
+                    <div class="mb-3">
+                        <label for="EventName" class="form-label fw-medium">Event Name</label>
+                        <input type="text" class="form-control" asp-for="EventName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="EventDescription" class="form-label fw-medium">Event Description</label>
+                        <textarea class="form-control" asp-for="EventDescription" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ClosingDate" class="form-label fw-medium">Closing Date For Summary</label>
+                        <input type="date" class="form-control" asp-for="EventDate" />
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="EventDescription" class="form-label fw-medium">Event Description</label>
-                    <textarea class="form-control" id="EventDescription" name="EventDescription" rows="3"></textarea>
+                <!-- E Wedding Card Setup Section -->
+                <div class="mb-4">
+                    <h5 class="fw-semibold mb-3">E Wedding Card Setup</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Groom Name</label>
+                        <input type="text" class="form-control" asp-for="GroomName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Bride Name</label>
+                        <input type="text" class="form-control" asp-for="BrideName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Groom Father Name</label>
+                        <input type="text" class="form-control" asp-for="GroomFatherName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Groom Mother Name</label>
+                        <input type="text" class="form-control" asp-for="GroomMotherName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Bride Father Name</label>
+                        <input type="text" class="form-control" asp-for="BrideFatherName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Bride Mother Name</label>
+                        <input type="text" class="form-control" asp-for="BrideMotherName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Wishes</label>
+                        <textarea type="text" class="form-control" asp-for="Wishes" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Venue Name</label>
+                        <input type="text" class="form-control" asp-for="VenueName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Venue Address 1</label>
+                        <input type="text" class="form-control" asp-for="Address1" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Venue Address 2</label>
+                        <input type="text" class="form-control" asp-for="Address2" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Venue Address 3</label>
+                        <input type="text" class="form-control" asp-for="Address3" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Venue Postcode</label>
+                        <input type="text" class="form-control" asp-for="Postcode" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">State</label>
+                        <input type="text" class="form-control" asp-for="State" />
+                    </div>
+                    <br/>
+
+                    <table class="table table-bordered" id="contactTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Family Role</th>
+                                <th>Phone Number</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for (int i = 0; i < Model.ContactInformations.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        <input asp-for="ContactInformations[@i].Name" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input asp-for="ContactInformations[@i].FamilyRole" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input asp-for="ContactInformations[@i].PhoneNumber" class="form-control" />
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <button type="button" id="addRowBtn" class="btn btn-primary mt-3">Add Row</button>
                 </div>
 
-                <div class="mb-3">
-                    <label for="ClosingDate" class="form-label fw-medium">Closing Date For Summary</label>
-                    <input type="date" class="form-control" id="ClosingDate" name="ClosingDate" />
+                <!-- Submit Button -->
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">Save Event</button>
                 </div>
-            </div>
-
-            <!-- E Wedding Card Setup Section -->
-            <div class="mb-4">
-                <h5 class="fw-semibold mb-3">E Wedding Card Setup <span class="text-muted">(skippable):</span></h5>
-
-                <div class="mb-3">
-                    <label for="MaleBride" class="form-label fw-medium">Male Bride</label>
-                    <input type="text" class="form-control" id="MaleBride" name="MaleBride" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="FemaleBride" class="form-label fw-medium">Female Bride</label>
-                    <input type="text" class="form-control" id="FemaleBride" name="FemaleBride" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="MaleBrideFather" class="form-label fw-medium">Male Bride's Father's Name</label>
-                    <input type="text" class="form-control" id="MaleBrideFather" name="MaleBrideFather" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="MaleBrideMother" class="form-label fw-medium">Male Bride's Mother's Name</label>
-                    <input type="text" class="form-control" id="MaleBrideMother" name="MaleBrideMother" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="FemaleBrideFather" class="form-label fw-medium">Female Bride's Father's Name</label>
-                    <input type="text" class="form-control" id="FemaleBrideFather" name="FemaleBrideFather" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="FemaleBrideMother" class="form-label fw-medium">Female Bride's Mother's Name</label>
-                    <input type="text" class="form-control" id="FemaleBrideMother" name="FemaleBrideMother" />
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary px-4">Save Event</button>
             </div>
         </div>
     </div>
-</div>
+
+    <script>
+        let rowIndex = @Model.ContactInformations.Count;
+
+        document.getElementById("addRowBtn").addEventListener("click", function () {
+
+            let tableBody = document.querySelector("#contactTable tbody");
+
+            let newRow = document.createElement("tr");
+
+            newRow.innerHTML = `
+                <td><input name="ContactInformations[${rowIndex}].Name" class="form-control" /></td>
+                <td><input name="ContactInformations[${rowIndex}].FamilyRole" class="form-control" /></td>
+                <td><input name="ContactInformations[${rowIndex}].PhoneNumber" class="form-control" /></td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+
+            rowIndex++;
+        });
+
+        // remove row
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("remove-row")) {
+                e.target.closest("tr").remove();
+            }
+        });
+    </script>
+
+</form>

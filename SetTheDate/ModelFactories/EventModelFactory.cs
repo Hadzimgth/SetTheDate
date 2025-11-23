@@ -30,19 +30,46 @@ namespace SetTheDate.ModelFactories
             return modelList;
         }
 
-        public async Task<UserEventModel> InsertUserEventAsync(UserEventModel userEventModel)
+        public async Task<UserEventModel> InsertUserEventAsync(UserEventModel userEventModel, int userId)
         {
-            var entity = _mapper.Map<UserEvent>(userEventModel);
-            _eventService.InsertEvent(entity);
+            //insert main table
+            var userEvent = new UserEvent();
+            userEvent.EventName = userEventModel.EventName;
+            userEvent.EventDescription = userEventModel.EventDescription;
+            userEvent.EventDate = userEventModel.EventDate;
+            //userEvent.EndDate = userEventModel.EndDate;
+            userEvent.PurgeDate = userEventModel.EventDate.AddDays(20);
+            userEvent.UserId = userId;
+            var model = await _eventService.InsertEvent(userEvent);
 
-            //double confirm if this returns the id or not
-            var model = _mapper.Map<UserEventModel>(entity);
-            return model;
+            // insert next table
+            var weddingInfo = new WeddingCardInformation();
+            weddingInfo.UserEventId = userEvent.Id;
+            weddingInfo.BrideName = userEventModel.BrideName;
+            weddingInfo.GroomName = userEventModel.GroomName;
+            weddingInfo.VenueName = userEventModel.VenueName;
+            weddingInfo.Address1 = userEventModel.Address1;
+            weddingInfo.Address2 = userEventModel.Address2;
+            weddingInfo.Address3 = userEventModel.Address3;
+            weddingInfo.Postcode = userEventModel.Postcode;
+            weddingInfo.State = userEventModel.State;
+            weddingInfo.WeddingCardType = userEventModel.WeddingCardType;
+            weddingInfo.EventImageAttachmentId = userEventModel.EventImageAttachmentId;
+            weddingInfo.GroomFatherName = userEventModel.GroomFatherName;
+            weddingInfo.GroomMotherName = userEventModel.GroomMotherName;
+            weddingInfo.BrideFatherName = userEventModel.BrideFatherName;
+            weddingInfo.BrideMotherName = userEventModel.BrideMotherName;
+            weddingInfo.Wishes = userEventModel.Wishes;
+            weddingInfo.UserEventId = model.Id;
+
+            await _eventService.InsertWeddingCardInformation(weddingInfo);
+
+            return _mapper.Map<UserEventModel>(userEvent);
         }
         public async Task<UserEventModel> UpdateUserEventAsync(UserEventModel userEventModel)
         {
             var entity = _mapper.Map<UserEvent>(userEventModel);
-            _eventService.UpdateEvent(entity);
+            await _eventService.UpdateEvent(entity);
 
             //double confirm if this returns the id or not
             var model = _mapper.Map<UserEventModel>(entity);
