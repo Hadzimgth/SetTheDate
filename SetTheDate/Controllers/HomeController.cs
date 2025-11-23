@@ -48,7 +48,7 @@ namespace SetTheDate.Controllers
         }
         public async Task<IActionResult> Register(RegisterModel model)
         {
-            var user = await _userModelFactory.ValidateUser(model);
+            var user = await _userModelFactory.RegisterUser(model);
 
             if (user == null)
             {

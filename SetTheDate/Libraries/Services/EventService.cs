@@ -1,4 +1,5 @@
-﻿using SetTheDate.Libraries.Dtos;
+﻿using Microsoft.EntityFrameworkCore;
+using SetTheDate.Libraries.Dtos;
 using SetTheDate.Libraries.Repositories;
 
 namespace SetTheDate.Libraries.Services
@@ -10,16 +11,22 @@ namespace SetTheDate.Libraries.Services
         public readonly EventGuestRepository _eventGuestRepository;
         public readonly EventGuestAnswerRepository _eventGuestAnswerRepository;
         public readonly EventAnswerRepository _eventAnswerRepository;
+        public readonly WeddingCardInformationRepository _weddingCardInformationRepository;
+        public readonly DbContext _dbContext;
 
         public EventService(UserEventRepository userEventRepository,
             EventQuestionRepository eventQuestionRepository,
             EventGuestRepository eventGuestRepository,
-            EventAnswerRepository eventAnswerRepository)
+            EventAnswerRepository eventAnswerRepository,
+            WeddingCardInformationRepository weddingCardInformationRepository,
+            DbContext dbContext)
         {
             _userEventRepository = userEventRepository;
             _eventQuestionRepository = eventQuestionRepository;
             _eventGuestRepository = eventGuestRepository;
             _eventAnswerRepository = eventAnswerRepository;
+            _weddingCardInformationRepository = weddingCardInformationRepository;
+            _dbContext = dbContext;
         }
 
         public async Task<UserEvent> GetEventByIdAsync(int id)
@@ -33,18 +40,49 @@ namespace SetTheDate.Libraries.Services
 
             return eventList;
         }
-        public void InsertEvent(UserEvent userEvent)
+        public async Task<UserEvent> InsertEvent(UserEvent userEvent)
         {
             _userEventRepository.Add(userEvent);
+
+            await _dbContext.SaveChangesAsync();
+
+            return userEvent;
         }
-        public void UpdateEvent(UserEvent userEvent)
+        public async Task<UserEvent> UpdateEvent(UserEvent userEvent)
         {
             _userEventRepository.Update(userEvent);
+
+            await _dbContext.SaveChangesAsync();
+
+            return userEvent;
         }
         public void DeleteEvent(UserEvent userEvent)
         {
             _userEventRepository.Delete(userEvent);
         }
+
+
+        public async Task<WeddingCardInformation> InsertWeddingCardInformation(WeddingCardInformation userWeddingCard)
+        {
+            _weddingCardInformationRepository.Add(userWeddingCard);
+
+            await _dbContext.SaveChangesAsync();
+
+            return userWeddingCard;
+        }
+        public async Task<WeddingCardInformation> UpdateWeddingCardInformation(WeddingCardInformation userWeddingCard)
+        {
+            _weddingCardInformationRepository.Update(userWeddingCard);
+
+            await _dbContext.SaveChangesAsync();
+
+            return userWeddingCard;
+        }
+        public void DeleteWeddingCardInformation(WeddingCardInformation userWeddingCard)
+        {
+            _weddingCardInformationRepository.Delete(userWeddingCard);
+        }
+
         public async Task<List<EventGuest>> GetEventGuestListByIEventdAsync(int eventId)
         {
             var eventGuestList = (await _eventGuestRepository.GetAllAsync()).Where(x => x.UserEventId == eventId).ToList();
