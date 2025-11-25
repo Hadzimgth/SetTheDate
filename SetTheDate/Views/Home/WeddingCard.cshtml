@@ -1,0 +1,55 @@
+﻿@model WeddingCardInformationModel
+
+@{
+    ViewData["Title"] = "eWedding Card";
+
+    var type = Model.WeddingCardType;
+    var bgPath = Url.Content($"~/background/Background_Type_{type}.png");
+    var leftPath = Url.Content($"~/background/BorderLeft_Type_{type}.png");
+    var rightPath = Url.Content($"~/background/BorderRight_Type_{type}.png");
+}
+
+<style>
+    .card-bg {
+        min-height: 100vh;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        position: relative;
+    }
+
+    .border-left, .border-right {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 120px;
+        background-repeat: repeat-y;
+        background-size: contain;
+    }
+
+    .border-left {
+        left: 0;
+    }
+
+    .border-right {
+        right: 0;
+    }
+
+    .content-area {
+        position: relative;
+        z-index: 2;
+        padding: 40px;
+    }
+</style>
+
+<div class="card-bg" style="background-image: url('@bgPath')">
+
+    <div class="border-left" style="background-image: url('@leftPath')"></div>
+
+    <div class="border-right" style="background-image: url('@rightPath')"></div>
+
+    <div class="content-area">
+        <h1 class="text-center text-white">Your Wedding Invitation</h1>
+    </div>
+
+</div>

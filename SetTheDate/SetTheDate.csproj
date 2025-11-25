@@ -12,13 +12,18 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.1.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="EPPlus" Version="8.3.0" />
+    <PackageReference Include="libphonenumber-csharp" Version="9.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.22" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="YDotNet.Repository" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Libraries\ApiModel\" />
+    <Folder Include="wwwroot\background\" />
+    <Folder Include="wwwroot\templates\" />
   </ItemGroup>
 
 </Project>
