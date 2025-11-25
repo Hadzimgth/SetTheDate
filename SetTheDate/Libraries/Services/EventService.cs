@@ -12,21 +12,18 @@ namespace SetTheDate.Libraries.Services
         public readonly EventGuestAnswerRepository _eventGuestAnswerRepository;
         public readonly EventAnswerRepository _eventAnswerRepository;
         public readonly WeddingCardInformationRepository _weddingCardInformationRepository;
-        public readonly DbContext _dbContext;
 
         public EventService(UserEventRepository userEventRepository,
             EventQuestionRepository eventQuestionRepository,
             EventGuestRepository eventGuestRepository,
             EventAnswerRepository eventAnswerRepository,
-            WeddingCardInformationRepository weddingCardInformationRepository,
-            DbContext dbContext)
+            WeddingCardInformationRepository weddingCardInformationRepository)
         {
             _userEventRepository = userEventRepository;
             _eventQuestionRepository = eventQuestionRepository;
             _eventGuestRepository = eventGuestRepository;
             _eventAnswerRepository = eventAnswerRepository;
             _weddingCardInformationRepository = weddingCardInformationRepository;
-            _dbContext = dbContext;
         }
 
         public async Task<UserEvent> GetEventByIdAsync(int id)
@@ -44,7 +41,7 @@ namespace SetTheDate.Libraries.Services
         {
             _userEventRepository.Add(userEvent);
 
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
 
             return userEvent;
         }
@@ -52,7 +49,7 @@ namespace SetTheDate.Libraries.Services
         {
             _userEventRepository.Update(userEvent);
 
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
 
             return userEvent;
         }
@@ -66,7 +63,7 @@ namespace SetTheDate.Libraries.Services
         {
             _weddingCardInformationRepository.Add(userWeddingCard);
 
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
 
             return userWeddingCard;
         }
@@ -74,7 +71,7 @@ namespace SetTheDate.Libraries.Services
         {
             _weddingCardInformationRepository.Update(userWeddingCard);
 
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
 
             return userWeddingCard;
         }
@@ -89,11 +86,10 @@ namespace SetTheDate.Libraries.Services
 
             return eventGuestList;
         }
-        public void InsertEventGuestListById(List<EventGuest> eventGuests, int eventId)
+        public void InsertEventGuestListById(List<EventGuest> eventGuests)
         {
             foreach (var guest in eventGuests)
             {
-                guest.UserEventId = eventId;
                 _eventGuestRepository.Add(guest);
             }
         }

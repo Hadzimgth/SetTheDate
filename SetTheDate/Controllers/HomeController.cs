@@ -109,5 +109,14 @@ namespace SetTheDate.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [HttpGet]
+        public IActionResult WeddingCard()
+        {
+            var weddingCard = new WeddingCardInformationModel();
+            weddingCard.WeddingCardType = 1;
+
+            return View(weddingCard);
+        }
     }
 }

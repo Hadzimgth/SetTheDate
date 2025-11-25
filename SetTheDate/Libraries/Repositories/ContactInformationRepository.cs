@@ -6,8 +6,9 @@ namespace SetTheDate.Libraries.Repositories
 {
     public class ContactInformationRepository : Repository<ContactInformation, int>
     {
-        public ContactInformationRepository(DbContext context) : base(context)
+        public ContactInformationRepository(ApplicationDbContext context) : base(context)
         {
         }
     }
+
 }

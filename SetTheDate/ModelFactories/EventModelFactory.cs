@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using PhoneNumbers;
 using SetTheDate.Libraries.Dtos;
 using SetTheDate.Libraries.Services;
 using SetTheDate.Models;
@@ -86,10 +87,10 @@ namespace SetTheDate.ModelFactories
             var modelList = _mapper.Map<List<EventGuestModel>>(eventList);
             return modelList;
         }
-        public void InsertGuestListAsync(List<EventGuestModel> eventGuestList, int eventId)
+        public void InsertGuestListAsync(List<EventGuestModel> eventGuestList)
         {
             var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
-            _eventService.InsertEventGuestListById(entities, eventId);
+            _eventService.InsertEventGuestListById(entities);
 
         }
         public void UpdateGuestListAsync(List<EventGuestModel> eventGuestList)
@@ -105,6 +106,25 @@ namespace SetTheDate.ModelFactories
 
         }
 
+        public bool ValidateMobile(string mobile)
+        {
+            if (string.IsNullOrWhiteSpace(mobile))
+                return false;
+
+            try
+            {
+                var phoneUtil = PhoneNumberUtil.GetInstance();
+
+                var number = phoneUtil.Parse(mobile, "MY");
+
+                return phoneUtil.IsValidNumber(number) &&
+                       phoneUtil.GetNumberType(number) == PhoneNumberType.MOBILE;
+            }
+            catch (NumberParseException)
+            {
+                return false;
+            }
+        }
 
 
 
