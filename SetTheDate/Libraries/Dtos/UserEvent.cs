@@ -13,7 +13,6 @@ namespace SetTheDate.Libraries.Dtos
         public bool Completed { get; set; }
         public int UserId { get; set; }
         public int PaymentInformationId { get; set; }
-        public int EventImageAttachmentId { get; set; }
 
     }
 }

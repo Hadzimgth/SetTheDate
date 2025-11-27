@@ -13,14 +13,15 @@ namespace SetTheDate.Libraries.Dtos
         public string BrideFatherName { get; set; }
         public string BrideMotherName { get; set; }
         public string Wishes { get; set; }
-        public string VenueName { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
         public string Address3 { get; set; }
         public string Postcode { get; set; }
         public string State { get; set; }
-        public int EventImageAttachmentId { get; set; }
         public int WeddingCardType { get; set; }
+        public string LocationName { get; set; }
+        public DateTime TimeFrom { get; set; }
+        public DateTime TimeTo { get; set; }
 
     }
 }

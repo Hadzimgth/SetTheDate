@@ -140,7 +140,7 @@ namespace SetTheDate.ModelFactories
             foreach (var question in modelList)
             {
                 var answers = answerListModel.Where(x => x.EventQuestionId == question.Id).ToList();
-                question.eventAnswerModels = answers;
+                question.EventAnswerModels = answers;
             }
 
             return modelList;
@@ -155,7 +155,7 @@ namespace SetTheDate.ModelFactories
                 //double confirm if this returns the id or not
                 _eventService.InsertEventQuestionById(entity);
 
-                foreach (var answerModel in question.eventAnswerModels)
+                foreach (var answerModel in question.EventAnswerModels)
                 {
                     var answerEntity = _mapper.Map<EventAnswer>(answerModel);
                     answerEntity.EventQuestionId = entity.Id;
