@@ -1,6 +1,8 @@
 ﻿@model WeddingCardInformationModel
 
 @{
+    Layout = null;
+
     ViewData["Title"] = "eWedding Card";
 
     var type = Model.WeddingCardType;
@@ -10,12 +12,29 @@
 }
 
 <style>
-    .card-bg {
-        min-height: 100vh;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
+    .title-handwriting {
+        font-family: 'modernline', sans-serif;
+        font-size: 100px;
+        text-align: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .card-container {
         position: relative;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .card-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-repeat: repeat;
+        pointer-events: none;
     }
 
     .border-left, .border-right {
@@ -37,19 +56,91 @@
 
     .content-area {
         position: relative;
-        z-index: 2;
-        padding: 40px;
+        z-index: 10;
+        margin-top: 120px;
+        text-align: center;
+    }
+
+    .center-image {
+        display: block;
+        margin: 0 auto;
+        max-width: 10%;
     }
 </style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SetTheDate</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SetTheDate.styles.css" asp-append-version="true" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</head>
+<body>
+    <div class="card-container">
 
-<div class="card-bg" style="background-image: url('@bgPath')">
+        <!-- Background images (absolute position) -->
+        <div class="card-bg" style="background-image: url('@bgPath')"></div>
+        <div class="border-left" style="background-image: url('@leftPath')"></div>
+        <div class="border-right" style="background-image: url('@rightPath')"></div>
 
-    <div class="border-left" style="background-image: url('@leftPath')"></div>
+        <!-- Content (normal layout) -->
+        <div class="content-area">
+            <img src="@Url.Content("~/image/bismillah.png")" class="center-image" />
+            <br />
+            <p>Meraikan 2 mempelai</p>
 
-    <div class="border-right" style="background-image: url('@rightPath')"></div>
+            <h1 class="title-handwriting">Muhammad Hadzim</h1>
+            <h1 class="title-handwriting">&</h1>
+            <h1 class="title-handwriting">Wafa Rufaidah</h1>
 
-    <div class="content-area">
-        <h1 class="text-center text-white">Your Wedding Invitation</h1>
+            <p>Daripada</p>
+
+            <h1 class="title-handwriting">@Model.GroomFatherName</h1>
+            <h1 class="title-handwriting">&</h1>
+            <h1 class="title-handwriting">@Model.GroomMotherName</h1>
+
+
+            <h1 class="title-handwriting">@Model.BrideFatherName</h1>
+            <h1 class="title-handwriting">&</h1>
+            <h1 class="title-handwriting">@Model.BrideMotherName</h1>
+
+            <p>Dengan penuh rasa syukur ke hadrat ilahi, ingin  menjemput</p>
+            <p>Dato’/Datin, Tuan/Puan, Encik/Cik</p>
+
+            <p>Pada</p>
+
+            <h1 class="title-handwriting">@Model.LocationName</h1>
+
+            <h1 class="title-handwriting">@Model.TimeFrom - @Model.TimeTo</h1>
+
+            <hr />
+
+            <h1 class="title-handwriting">@Model.Wishes</h1>
+
+            <hr />
+            @foreach (var contactPerson in Model.ContactInformations)
+            {
+                <div class="row">
+                    <p>@contactPerson.Name</p>
+                    <p>@contactPerson.FamilyRole</p>
+                    <p>@contactPerson.PhoneNumber</p>
+                </div>
+            }
+            <hr />
+
+            <h1 class="title-handwriting">Leave your wishes here:</h1>
+            <textarea rows="4" cols="50" placeholder="Type your wishes..."></textarea>
+
+            @* here need display the wishes *@
+
+        </div>
+
     </div>
+</body>
 
-</div>
+</html>
