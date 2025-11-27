@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SetTheDate.Libraries;
 using SetTheDate.Libraries.Repositories;
@@ -51,7 +52,16 @@ builder.Services.AddScoped<GuestModelFactory>();
 builder.Services.AddScoped<EventModelFactory>();
 builder.Services.AddScoped<AttachmentModelFactory>();
 
+//validator
+builder.Services.AddValidatorsFromAssemblyContaining<ContactInformationModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<EventAnswerModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<EventQuestionModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<GuestWishesModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UserEventModelValidator>();
+
 var app = builder.Build();
+
 
 // --- Middleware ---
 if (!app.Environment.IsDevelopment())

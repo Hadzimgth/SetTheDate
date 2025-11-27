@@ -6,6 +6,7 @@ namespace SetTheDate.Libraries.Dtos
     {
         public int Id { get; set; }
         public int UserEventId { get; set; }
+        public string VenueName { get; set; }
         public string GroomName { get; set; }
         public string BrideName { get; set; }
         public string GroomFatherName { get; set; }

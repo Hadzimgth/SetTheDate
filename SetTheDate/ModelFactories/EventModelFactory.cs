@@ -55,7 +55,6 @@ namespace SetTheDate.ModelFactories
             weddingInfo.Postcode = userEventModel.Postcode;
             weddingInfo.State = userEventModel.State;
             weddingInfo.WeddingCardType = userEventModel.WeddingCardType;
-            weddingInfo.EventImageAttachmentId = userEventModel.EventImageAttachmentId;
             weddingInfo.GroomFatherName = userEventModel.GroomFatherName;
             weddingInfo.GroomMotherName = userEventModel.GroomMotherName;
             weddingInfo.BrideFatherName = userEventModel.BrideFatherName;
