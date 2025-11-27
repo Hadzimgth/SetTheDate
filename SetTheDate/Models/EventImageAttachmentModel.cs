@@ -7,6 +7,7 @@
         public string Position { get; set; }
         public string FilePath { get; set; }
         public int UserEventId { get; set; }
+        public int WeddingCardId { get; set; }
 
     }
 }

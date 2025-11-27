@@ -6,6 +6,7 @@
         public int EventGuestId { get; set; }
         public int EventQuestionId { get; set; }
         public int EventAnswerId { get; set; }
+        public int EventId { get; set; }
 
     }
 }
