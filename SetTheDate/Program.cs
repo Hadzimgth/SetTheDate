@@ -6,7 +6,8 @@ using SetTheDate.ModelFactories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation();
 builder.Services.AddAutoMapper(cfg => { }, typeof(ModelMapper).Assembly);
 
 // --- DbContext ---
