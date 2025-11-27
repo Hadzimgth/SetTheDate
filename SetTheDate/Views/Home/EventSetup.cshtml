@@ -10,6 +10,7 @@
     <div style="background-color:#a7c8ff; min-height:100vh;">
         <div class="container py-4">
             <div class="bg-white p-4 rounded-4 shadow-sm">
+                <div asp-validation-summary="All" class="text-danger"></div>
                 <h3 class="fw-bold mb-4">Let's get to know your event:</h3>
                 <div class="mb-4">
                     <h5 class="fw-semibold mb-3">Event Setup:</h5>
@@ -18,16 +19,19 @@
                     <div class="mb-3">
                         <label for="EventName" class="form-label fw-medium">Event Name</label>
                         <input type="text" class="form-control" asp-for="EventName" />
+                        <span asp-validation-for="EventName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label for="EventDescription" class="form-label fw-medium">Event Description</label>
                         <textarea class="form-control" asp-for="EventDescription" rows="3"></textarea>
+                        <span asp-validation-for="EventDescription" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label for="ClosingDate" class="form-label fw-medium">Closing Date For Summary</label>
                         <input type="date" class="form-control" asp-for="EventDate" />
+                        <span asp-validation-for="EventDate" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -38,66 +42,79 @@
                     <div class="mb-3">
                         <label class="form-label fw-medium">Groom Name</label>
                         <input type="text" class="form-control" asp-for="GroomName" />
+                        <span asp-validation-for="GroomName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Bride Name</label>
                         <input type="text" class="form-control" asp-for="BrideName" />
+                        <span asp-validation-for="BrideName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Groom Father Name</label>
                         <input type="text" class="form-control" asp-for="GroomFatherName" />
+                        <span asp-validation-for="GroomFatherName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Groom Mother Name</label>
                         <input type="text" class="form-control" asp-for="GroomMotherName" />
+                        <span asp-validation-for="GroomMotherName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Bride Father Name</label>
                         <input type="text" class="form-control" asp-for="BrideFatherName" />
+                        <span asp-validation-for="BrideFatherName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Bride Mother Name</label>
                         <input type="text" class="form-control" asp-for="BrideMotherName" />
+                        <span asp-validation-for="BrideMotherName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Wishes</label>
                         <textarea type="text" class="form-control" asp-for="Wishes" />
+                        <span asp-validation-for="Wishes" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Venue Name</label>
                         <input type="text" class="form-control" asp-for="VenueName" />
+                        <span asp-validation-for="VenueName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Venue Address 1</label>
                         <input type="text" class="form-control" asp-for="Address1" />
+                        <span asp-validation-for="Address1" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Venue Address 2</label>
                         <input type="text" class="form-control" asp-for="Address2" />
+                        <span asp-validation-for="Address2" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Venue Address 3</label>
                         <input type="text" class="form-control" asp-for="Address3" />
+                        <span asp-validation-for="Address3" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Venue Postcode</label>
                         <input type="text" class="form-control" asp-for="Postcode" />
+                        <span asp-validation-for="Postcode" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">State</label>
                         <input type="text" class="form-control" asp-for="State" />
+                        <span asp-validation-for="State" class="text-danger"></span>
                     </div>
                     <br/>
 
