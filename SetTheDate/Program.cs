@@ -1,3 +1,4 @@
+using FluentMigrator.Runner;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SetTheDate.Libraries;
@@ -12,10 +13,27 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddAutoMapper(cfg => { }, typeof(ModelMapper).Assembly);
 
 // --- DbContext ---
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("TempDb"));
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//    options.UseInMemoryDatabase("TempDb"));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("ConnectionString");
+
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString)
+    );
+});
+
+builder.Services.AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb
+        .AddMySql5()
+        .WithGlobalConnectionString(
+            builder.Configuration.GetConnectionString("ConnectionString")
+        )
+        .ScanIn(typeof(Program).Assembly).For.Migrations()
+    )
+    .AddLogging(lb => lb.AddFluentMigratorConsole());
 
 // --- Session ---
 builder.Services.AddDistributedMemoryCache();
@@ -62,6 +80,11 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserEventModelValidator>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+    runner.MigrateUp();
+}
 
 // --- Middleware ---
 if (!app.Environment.IsDevelopment())
