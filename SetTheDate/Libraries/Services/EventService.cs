@@ -152,7 +152,7 @@ namespace SetTheDate.Libraries.Services
         }
         public async Task<List<EventGuestAnswer>> GetGuestAnswerListByEventIdAsync(int eventId)
         {
-            var eventAnswerList = (await _eventGuestAnswerRepository.GetAllAsync()).Where(x => x.EventId == eventId).ToList();
+            var eventAnswerList = (await _eventGuestAnswerRepository.GetAllAsync()).Where(x => x.UserEventId == eventId).ToList();
 
             return eventAnswerList;
         }
