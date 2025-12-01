@@ -92,7 +92,8 @@ namespace SetTheDate.Controllers
         }
         public IActionResult GuestQuestion()
         {
-            return View();
+            var tempModel = new EventSurveySetup();
+            return View(tempModel);
         }
         public IActionResult EventSetupSummary()
         {
