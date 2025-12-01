@@ -1,4 +1,6 @@
-﻿@{
+﻿@model EventSurveySetup
+
+@{
     ViewData["Title"] = "Guest Question Setup";
 }
 
@@ -7,7 +9,6 @@
         <div class="bg-white p-4 rounded-4 shadow-sm">
             <h3 class="fw-bold mb-4">What do you need from your guest:</h3>
 
-            <!-- Question Setup Header -->
             <div class="mb-4">
                 <h5 class="fw-semibold mb-2">
                     Question Setup:
@@ -18,72 +19,138 @@
                     As example, you can ask about the pax, food restriction, or you can even set a predefined
                     answer in case there is a food menu.
                 </p>
+                <input asp-for="UserEventId" type="hidden" />
             </div>
 
-            <!-- Question List -->
-            <div class="bg-light p-3 rounded-3 mb-3">
-                <input type="text" class="form-control mb-2" value="How many will you bring to the wedding?" />
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q1" id="q1opt1" />
-                    <label class="form-check-label" for="q1opt1">1</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q1" id="q1opt2" />
-                    <label class="form-check-label" for="q1opt2">2</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q1" id="q1opt3" />
-                    <label class="form-check-label" for="q1opt3">3</label>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label text-primary" style="cursor:pointer;">Add others</label>
-                </div>
+            <div id="question-container">
+                @for (var q = 0; q < Model.EventQuestionListModel.Count; q++)
+                {
+                    <div class="bg-light p-3 rounded-3 mb-3 question-block" data-index="@q">
+                        <div class="fw-bold mb-2">
+                            Question <span class="question-number"></span>
+                        </div>
+                        <input class="form-control mb-2" name="EventQuestionListModel[@q].Question" value="@Model.EventQuestionListModel[q].Question" />
+
+                        <div class="answers-container">
+                            @for (var a = 0; a < Model.EventQuestionListModel[q].EventAnswerListModel.Count; a++)
+                            {
+                                <label class="form-label">
+                                    Answer <span class="answer-number"></span>
+                                </label>
+
+                                <div class="form-check mb-1 answer-block">
+                                    <input class="form-control" name="EventQuestionListModel[@q].EventAnswerListModel[@a].Answer" value="@Model.EventQuestionListModel[q].EventAnswerListModel[a].Answer" />
+                                </div>
+                            }
+                        </div>
+
+                        <button type="button" class="btn btn-sm btn-primary add-answer-btn">
+                            Add Answer
+                        </button>
+                    </div>
+                }
             </div>
 
-            <div class="bg-light p-3 rounded-3 mb-3">
-                <input type="text" class="form-control mb-2" value="Please select from the prefix menu" />
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q2" id="q2opt1" />
-                    <label class="form-check-label" for="q2opt1">Nasi Briyani + Butter Chicken</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q2" id="q2opt2" />
-                    <label class="form-check-label" for="q2opt2">Nasi Briyani + Fried Silver Catfish</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q2" id="q2opt3" />
-                    <label class="form-check-label" for="q2opt3">Plain Rice + Fried Chicken</label>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label text-primary" style="cursor:pointer;">Add others</label>
-                </div>
-            </div>
+            <button type="button" id="add-question-btn" class="btn btn-success mt-3">
+                Add Question
+            </button>
 
-            <div class="bg-light p-3 rounded-3 mb-3">
-                <input type="text" class="form-control mb-2" value="Where do I know you from? (To sit you with the same group as our friends)" />
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q3" id="q3opt1" />
-                    <label class="form-check-label" for="q3opt1">High School</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q3" id="q3opt2" />
-                    <label class="form-check-label" for="q3opt2">UTM</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="q3" id="q3opt3" />
-                    <label class="form-check-label" for="q3opt3">Work</label>
-                </div>
-                <div class="form-check">
-                    <label class="form-check-label text-primary" style="cursor:pointer;">Add others</label>
+            <div id="question-template" class="d-none">
+                <div class="bg-light p-3 rounded-3 mb-3 question-block">
+                    <div class="fw-bold mb-2">
+                        Question <span class="question-number"></span>
+                    </div>
+                    <input class="form-control mb-2 question-input" name="__name__.Question" />
+
+                    <div class="answers-container"></div>
+
+                    <button type="button" class="btn btn-sm btn-primary add-answer-btn">
+                        Add Answer
+                    </button>
                 </div>
             </div>
 
-            <!-- Add Question Button -->
-            <div class="text-center mt-4">
-                <button type="button" class="btn btn-outline-primary w-100 py-2">
-                    + Add Questions
-                </button>
+            <div id="answer-template" class="d-none">
+                <div class="form-check mb-1 answer-block">
+                    <label class="form-label">
+                        Answer <span class="answer-number"></span>
+                    </label>
+
+                    <input class="form-control answer-input" name="__ansname__.Answer" />
+                </div>
             </div>
+
         </div>
     </div>
+    <script>
+        let questionIndex = @Model.EventQuestionListModel.Count;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            refreshQuestionNumbers();
+            refreshAnswerNumbers();
+        });
+
+        document.getElementById("add-question-btn").addEventListener("click", function () {
+
+            let template = document.getElementById("question-template").innerHTML;
+            let html = template.replace(/__name__/g, `EventQuestionListModel[${questionIndex}]`);
+
+            let container = document.getElementById("question-container");
+            let block = document.createElement("div");
+            block.innerHTML = html.trim();
+
+            block.querySelector(".question-block").setAttribute("data-index", questionIndex);
+            container.appendChild(block.firstElementChild);
+
+            questionIndex++;
+
+            refreshQuestionNumbers();
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("add-answer-btn")) {
+
+                let questionBlock = e.target.closest(".question-block");
+                let qIndex = questionBlock.dataset.index;
+
+                let answersContainer = questionBlock.querySelector(".answers-container");
+
+                let aIndex = answersContainer.querySelectorAll(".answer-block").length;
+
+                let template = document.getElementById("answer-template").innerHTML;
+
+                let html = template.replace(/__ansname__/g,
+                    `EventQuestionListModel[${qIndex}].EventAnswerListModel[${aIndex}]`
+                );
+
+                let block = document.createElement("div");
+                block.innerHTML = html.trim();
+
+                answersContainer.appendChild(block.firstElementChild);
+
+                refreshAnswerNumbers();
+            }
+        });
+
+        function refreshAnswerNumbers() {
+            const questionBlocks = document.querySelectorAll('.question-block');
+
+            questionBlocks.forEach(block => {
+                const answerBlocks = block.querySelectorAll('.answer-block');
+                answerBlocks.forEach((ans, index) => {
+                    const numSpan = ans.querySelector('.answer-number');
+                    if (numSpan) numSpan.textContent = index + 1;
+                });
+            });
+        }
+
+        function refreshQuestionNumbers() {
+            const questionBlocks = document.querySelectorAll('.question-block');
+            questionBlocks.forEach((block, index) => {
+                const numSpan = block.querySelector('.question-number');
+                if (numSpan) numSpan.textContent = index + 1;
+            });
+        }
+
+    </script>
 </div>
