@@ -7,7 +7,7 @@
 <div style="background-color:#a7c8ff; min-height:100vh;">
     <div class="container py-4">
         <div class="bg-white p-4 rounded-4 shadow-sm">
-            <form id="guestForm" asp-action="GuestSetup" asp-controller="Guest" method="post" enctype="multipart/form-data">
+            <form id="guestForm" asp-action="GuestSetup" asp-controller="Event" method="post" enctype="multipart/form-data">
                 <h3 class="fw-bold mb-4">Let's Setup Your Guest:</h3>
                 <!-- Guest Setup Section -->
                 <div class="mb-4">
@@ -57,17 +57,30 @@
                                         var guest = Model.eventGuestList[i];
                                         <tr>
                                             <td>@(i + 1)</td>
-                                            <td>@guest.GuestName</td>
-                                            <td>@guest.PhoneNumber</td>
+
+                                            <td>
+                                                @guest.GuestName
+                                                <input type="hidden" name="eventGuestList[@i].GuestName" value="@guest.GuestName" />
+                                            </td>
+
+                                            <td>
+                                                @guest.PhoneNumber
+                                                <input type="hidden" name="eventGuestList[@i].PhoneNumber" value="@guest.PhoneNumber" />
+                                            </td>
+
                                             <td>
                                                 @if (guest.IsValid)
                                                 {
                                                     <span class="badge bg-success">Active</span>
+                                                    <input type="hidden" name="eventGuestList[@i].IsValid" value="true" />
                                                 }
                                                 else
                                                 {
                                                     <span class="badge bg-danger">No</span>
+                                                    <input type="hidden" name="eventGuestList[@i].IsValid" value="false" />
                                                 }
+
+                                                <input type="hidden" name="eventGuestList[@i].UserEventId" value="@Model.UserEventId" />
                                             </td>
                                         </tr>
                                     }
@@ -85,7 +98,7 @@
                 @if (Model?.eventGuestList != null && Model.eventGuestList.Any())
                 {
                     <div class="mt-3 text-end">
-                        <button type="submit" formaction="@Url.Action("SaveGuestList", "Guest")" class="btn btn-success px-4">
+                        <button type="submit" formaction="@Url.Action("SaveGuestList", "Event")" class="btn btn-success px-4">
                             Save Guests
                         </button>
                     </div>

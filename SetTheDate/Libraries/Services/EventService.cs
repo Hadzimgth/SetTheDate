@@ -12,18 +12,24 @@ namespace SetTheDate.Libraries.Services
         public readonly EventGuestAnswerRepository _eventGuestAnswerRepository;
         public readonly EventAnswerRepository _eventAnswerRepository;
         public readonly WeddingCardInformationRepository _weddingCardInformationRepository;
+        public readonly ContactInformationRepository _contactInformationRepository;
+        private readonly ApplicationDbContext _context;
 
         public EventService(UserEventRepository userEventRepository,
             EventQuestionRepository eventQuestionRepository,
             EventGuestRepository eventGuestRepository,
             EventAnswerRepository eventAnswerRepository,
-            WeddingCardInformationRepository weddingCardInformationRepository)
+            WeddingCardInformationRepository weddingCardInformationRepository,
+            ContactInformationRepository contactInformationRepository,
+            ApplicationDbContext context)
         {
             _userEventRepository = userEventRepository;
             _eventQuestionRepository = eventQuestionRepository;
             _eventGuestRepository = eventGuestRepository;
             _eventAnswerRepository = eventAnswerRepository;
             _weddingCardInformationRepository = weddingCardInformationRepository;
+            _contactInformationRepository = contactInformationRepository;
+            _context = context;
         }
 
         public async Task<UserEvent> GetEventByIdAsync(int id)
@@ -40,44 +46,45 @@ namespace SetTheDate.Libraries.Services
         public async Task<UserEvent> InsertEvent(UserEvent userEvent)
         {
             _userEventRepository.Add(userEvent);
-
-            //await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return userEvent;
         }
         public async Task<UserEvent> UpdateEvent(UserEvent userEvent)
         {
             _userEventRepository.Update(userEvent);
-
-            //await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return userEvent;
         }
-        public void DeleteEvent(UserEvent userEvent)
+        public async Task DeleteEvent(UserEvent userEvent)
         {
             _userEventRepository.Delete(userEvent);
+            await _context.SaveChangesAsync();
         }
 
-
+        public async Task<WeddingCardInformation> GetWeddingCardByEventIdAsync(int id)
+        {
+            return (await _weddingCardInformationRepository.GetAllAsync()).Where(x => x.UserEventId == id).FirstOrDefault();
+        }
         public async Task<WeddingCardInformation> InsertWeddingCardInformation(WeddingCardInformation userWeddingCard)
         {
             _weddingCardInformationRepository.Add(userWeddingCard);
-
-            //await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return userWeddingCard;
         }
         public async Task<WeddingCardInformation> UpdateWeddingCardInformation(WeddingCardInformation userWeddingCard)
         {
             _weddingCardInformationRepository.Update(userWeddingCard);
-
-            //await _dbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return userWeddingCard;
         }
-        public void DeleteWeddingCardInformation(WeddingCardInformation userWeddingCard)
+        public async Task DeleteWeddingCardInformation(WeddingCardInformation userWeddingCard)
         {
             _weddingCardInformationRepository.Delete(userWeddingCard);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<EventGuest>> GetEventGuestListByIEventdAsync(int eventId)
@@ -86,26 +93,31 @@ namespace SetTheDate.Libraries.Services
 
             return eventGuestList;
         }
-        public void InsertEventGuestListById(List<EventGuest> eventGuests)
+        public async Task InsertEventGuestList(List<EventGuest> eventGuests)
         {
             foreach (var guest in eventGuests)
             {
                 _eventGuestRepository.Add(guest);
             }
+            _context.Database.SetCommandTimeout(120);
+            await _context.SaveChangesAsync();
         }
-        public void UpdateEventGuestListById(List<EventGuest> eventGuests)
+        public async Task UpdateEventGuestList(List<EventGuest> eventGuests)
         {
             foreach (var guest in eventGuests)
             {
                 _eventGuestRepository.Update(guest);
             }
+
+            await _context.SaveChangesAsync();
         }
-        public void DeleteEventGuestListById(List<EventGuest> eventGuests)
+        public async Task DeleteEventGuestList(List<EventGuest> eventGuests)
         {
             foreach (var guest in eventGuests)
             {
                 _eventGuestRepository.Delete(guest);
             }
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<EventQuestion>> GetEventQuestionListByIdAsync(int eventId)
@@ -114,23 +126,28 @@ namespace SetTheDate.Libraries.Services
 
             return eventQuestionList;
         }
-        public void InsertEventQuestionById(EventQuestion eventQuestion)
+        public async Task InsertEventQuestion(EventQuestion eventQuestion)
         {
-            _eventQuestionRepository.Add(eventQuestion);
+            _eventQuestionRepository.Add(eventQuestion); 
+            await _context.SaveChangesAsync();
         }
-        public void UpdateEventQuestionListById(List<EventQuestion> eventQuestions)
+        public async Task UpdateEventQuestionList(List<EventQuestion> eventQuestions)
         {
             foreach (var guest in eventQuestions)
             {
                 _eventQuestionRepository.Update(guest);
             }
+
+            await _context.SaveChangesAsync();
         }
-        public void DeleteEventQuestionListById(List<EventQuestion> eventQuestions)
+        public async Task DeleteEventQuestionList(List<EventQuestion> eventQuestions)
         {
             foreach (var guest in eventQuestions)
             {
                 _eventQuestionRepository.Delete(guest);
             }
+
+            await _context.SaveChangesAsync();
         }
         public async Task<List<EventAnswer>> GetEventAnswerListByEventIdAsync(int EventId)
         {
@@ -138,17 +155,20 @@ namespace SetTheDate.Libraries.Services
 
             return eventAnswerList;
         }
-        public void InsertEventAnswer(EventAnswer eventAnswer)
+        public async Task InsertEventAnswer(EventAnswer eventAnswer)
         {
             _eventAnswerRepository.Add(eventAnswer);
+            await _context.SaveChangesAsync();
         }
-        public void UpdateEventAnswer(EventAnswer eventAnswer)
+        public async Task UpdateEventAnswer(EventAnswer eventAnswer)
         {
             _eventAnswerRepository.Update(eventAnswer);
+            await _context.SaveChangesAsync();
         }
-        public void DeleteEventAnswer(EventAnswer eventAnswer)
+        public async Task DeleteEventAnswer(EventAnswer eventAnswer)
         {
             _eventAnswerRepository.Delete(eventAnswer);
+            await _context.SaveChangesAsync();
         }
         public async Task<List<EventGuestAnswer>> GetGuestAnswerListByEventIdAsync(int eventId)
         {
@@ -156,13 +176,33 @@ namespace SetTheDate.Libraries.Services
 
             return eventAnswerList;
         }
-        public void InsertGuestAnswer(EventGuestAnswer answer)
+        public async Task InsertGuestAnswer(EventGuestAnswer answer)
         {
             _eventGuestAnswerRepository.Add(answer);
+            await _context.SaveChangesAsync();
         }
-        public void DeleteGeestAnswer(EventGuestAnswer answer)
+        public async Task DeleteGeestAnswer(EventGuestAnswer answer)
         {
-            _eventGuestAnswerRepository.Delete(answer);
+            _eventGuestAnswerRepository.Delete(answer); 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task InsertContactInformationList(List<ContactInformation> contactInformationList)
+        {
+            foreach (var contact in contactInformationList)
+            {
+                _contactInformationRepository.Add(contact);
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateContactInformationList(List<ContactInformation> contactInformationList)
+        {
+            foreach (var contact in contactInformationList)
+            {
+                _contactInformationRepository.Update(contact);
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }

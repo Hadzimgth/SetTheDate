@@ -63,6 +63,7 @@ builder.Services.AddScoped<AttachmentService>();
 builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<GuestService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PaymentService>();
 
 // --- Model Factories ---
 builder.Services.AddScoped<UserModelFactory>();
@@ -77,6 +78,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<EventQuestionModelValidator
 builder.Services.AddValidatorsFromAssemblyContaining<GuestWishesModelValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterModelValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserEventModelValidator>();
+
+System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
 var app = builder.Build();
 

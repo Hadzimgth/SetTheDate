@@ -10,9 +10,12 @@ namespace SetTheDate.Libraries.Dtos
         public DateTime EventDate { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime PurgeDate { get; set; }
+        public string Status { get; set; }
         public bool Completed { get; set; }
         public int UserId { get; set; }
         public int PaymentInformationId { get; set; }
+        public int TotalGuest { get; set; }
+        public int GuestResponded { get; set; }
 
     }
 }

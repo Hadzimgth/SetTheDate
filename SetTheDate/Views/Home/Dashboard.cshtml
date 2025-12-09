@@ -1,4 +1,6 @@
-﻿<body>
+﻿@model DashboardModel
+
+<body>
     @{
         ViewData["Title"] = "Dashboard";
     }
@@ -9,8 +11,8 @@
             <div class="bg-white p-4 rounded-4 shadow-sm">
                 <!-- Header Row -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="fw-bold mb-0">Hi Sarah,</h1>
-                    <a href="@Url.Action("CreateEvent", "Event")" class="btn btn-dark">
+                    <h1 class="fw-bold mb-0">Hi @Model.Name,</h1>
+                    <a href="@Url.Action("EventSetup", "Event")" class="btn btn-dark">
                         + Create Event
                     </a>
                 </div>
@@ -20,24 +22,23 @@
                     <div class="col-md-4 mb-3">
                         <div class="p-3 rounded-4 shadow-sm bg-light">
                             <p class="fw-semibold text-decoration-underline mb-1">Draft Event:</p>
-                            <h2 class="fw-bold mb-0">2</h2>
+                            <h2 class="fw-bold mb-0">@Model.DraftEventCount</h2>
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
                         <div class="p-3 rounded-4 shadow-sm bg-light">
                             <p class="fw-semibold text-decoration-underline mb-1">Ongoing Event:</p>
-                            <h2 class="fw-bold mb-0">1</h2>
+                            <h2 class="fw-bold mb-0">@Model.ActiveEventCount</h2>
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
                         <div class="p-3 rounded-4 shadow-sm bg-light">
                             <p class="fw-semibold text-decoration-underline mb-1">Completed Event:</p>
-                            <h2 class="fw-bold mb-0">0</h2>
+                            <h2 class="fw-bold mb-0">@Model.CompletedEventCount</h2>
                         </div>
                     </div>
                 </div>
 
-                <!-- Available Event Table -->
                 <div class="bg-white p-3 rounded-4 shadow-sm">
                     <h5 class="fw-bold mb-3">Available Event:</h5>
                     <div class="table-responsive">
@@ -46,23 +47,44 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Event Name</th>
-                                    <th>Created Date</th>
+                                    <th>Status</th>
+                                    <th>Event Date</th>
                                     <th>End Date</th>
                                     <th>Total Guest</th>
                                     <th>Guest Responded</th>
-                                    <th>Landing Page</th>
+                                    <th>Edit</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Sarah & Firdaus</td>
-                                    <td>02/01/2025</td>
-                                    <td>31/03/2025</td>
-                                    <td>500</td>
-                                    <td>320</td>
-                                    <td><a href="#" class="text-primary text-decoration-none">Click Here</a></td>
-                                </tr>
+                                @if (Model.UserEventModelList == null || Model.UserEventModelList.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-3">
+                                            No event data available.
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < Model.UserEventModelList.Count; i++)
+                                    {
+                                        var item = Model.UserEventModelList[i];
+                                        <tr>
+                                            <td>@(i + 1)</td>
+                                            <td>@item.EventName</td>
+                                            <td>@item.Status</td>
+                                            <td>@item.EventDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.EndDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.TotalGuest</td>
+                                            <td>@item.GuestResponded</td>
+                                            <td>
+                                                <a href="/Event/EventSetup?eventId=@item.Id" class="text-primary text-decoration-none">
+                                                    Click Here
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
                             </tbody>
                         </table>
                     </div>

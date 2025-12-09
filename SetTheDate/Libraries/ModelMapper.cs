@@ -32,6 +32,8 @@ namespace SetTheDate.Libraries
             CreateMap<RegisterModel, User>().ReverseMap();
             CreateMap<UserEvent, UserEventModel>().ReverseMap();
             CreateMap<UserEventModel, UserEvent>().ReverseMap();
+            CreateMap<WeddingCardInformation, UserEventModel>().ReverseMap();
+            CreateMap<UserEventModel, WeddingCardInformation>().ReverseMap();
             CreateMap<WeddingCardInformation, WeddingCardInformationModel>().ReverseMap();
             CreateMap<WeddingCardInformationModel, WeddingCardInformation>().ReverseMap();
 

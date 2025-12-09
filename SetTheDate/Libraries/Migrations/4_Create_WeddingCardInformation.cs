@@ -10,7 +10,6 @@ namespace SetTheDate.Migrations
             Create.Table("WeddingCardInformation")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("UserEventId").AsInt32().NotNullable()
-                .WithColumn("VenueName").AsString(200).Nullable()
                 .WithColumn("GroomName").AsString(200).Nullable()
                 .WithColumn("BrideName").AsString(200).Nullable()
                 .WithColumn("GroomFatherName").AsString(200).Nullable()
