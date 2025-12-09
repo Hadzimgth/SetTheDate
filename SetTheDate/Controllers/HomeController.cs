@@ -9,11 +9,13 @@ namespace SetTheDate.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserModelFactory _userModelFactory;
+        private readonly EventModelFactory _eventModelFactory;
 
-        public HomeController(ILogger<HomeController> logger, UserModelFactory userModelFactory)
+        public HomeController(ILogger<HomeController> logger, UserModelFactory userModelFactory, EventModelFactory eventModelFactory)
         {
             _logger = logger;
             _userModelFactory = userModelFactory;
+            _eventModelFactory = eventModelFactory;
         }
 
         [HttpGet]
@@ -36,9 +38,10 @@ namespace SetTheDate.Controllers
             // Store session
             HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("UserName", user.Email);
+            HttpContext.Session.SetString("Name", user.Name);
             HttpContext.Session.SetString("UserIsAdmin", user.IsAdmin.ToString());
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Dashboard", "Home");
         }
 
         [HttpGet]
@@ -52,7 +55,7 @@ namespace SetTheDate.Controllers
 
             if (user == null)
             {
-                ViewBag.Error = "Error";
+                ViewBag.Error = "Error in creating user";
                 return View();
             }
 
@@ -78,9 +81,20 @@ namespace SetTheDate.Controllers
         {
             return View();
         }
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
-            return View();
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            string name = HttpContext.Session.GetString("Name") ?? "";
+
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var dashboardModel = await _eventModelFactory.GetAllEventByUserIdAsync(userId.Value);
+            dashboardModel.Name = name;
+
+            return View(dashboardModel);
         }
         public IActionResult EventSetup()
         {

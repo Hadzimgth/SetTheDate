@@ -23,8 +23,11 @@ namespace SetTheDate.ModelFactories
             if (entity == null)
                 return null;
 
-            if (!BCrypt.Net.BCrypt.Verify(loginModel.Password, entity.Password))
-                return null;
+            if (entity.Password != loginModel.Password)
+               return null;
+
+            //if (!BCrypt.Net.BCrypt.Verify(loginModel.Password, entity.Password))
+            //    return null;
 
             var model = _mapper.Map<UserModel>(entity);
 

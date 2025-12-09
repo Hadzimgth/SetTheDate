@@ -40,7 +40,7 @@
                 <div class="col-md-6 d-flex align-items-center justify-content-center bg-white">
                     <div style="width: 350px;">
                         <h5 class="mb-4 fw-semibold text-center">Login</h5>
-                        <form asp-action="Login" asp-controller="HomeController" method="post">
+                        <form asp-action="Login" asp-controller="Home" method="post">
                             <div class="mb-3">
                                 <input type="text" name="Email" class="form-control" placeholder="Email" />
                             </div>
@@ -62,7 +62,9 @@
 
                         <p class="text-center small">
                             Don't have an account?
-                            <a href="#" class="text-primary text-decoration-none">Sign up now</a>
+                            <a href="@Url.Action("Register", "Home")" class="text-primary text-decoration-none">
+                                Sign up now
+                            </a>
                         </p>
                     </div>
                 </div>

@@ -9,46 +9,76 @@ namespace SetTheDate.ModelFactories
     public class EventModelFactory
     {
         private readonly EventService _eventService;
+        private readonly PaymentService _paymentService;
         private readonly IMapper _mapper;
 
         public EventModelFactory(EventService eventService,
+            PaymentService paymentService,
             IMapper mapper)
         {
             _eventService = eventService;
+            _paymentService = paymentService;
             _mapper = mapper;
         }
 
-        public async Task<UserEventModel> GetEventByIdAsync(int id)
+        public async Task<UserEventModel> GetEventAndWeddingCardByIdAsync(int id)
         {
             var entity = await _eventService.GetEventByIdAsync(id);
-            var model = _mapper.Map<UserEventModel>(entity);
+
+            var weddingCard = await _eventService.GetWeddingCardByEventIdAsync(id);
+            var model = _mapper.Map<UserEventModel>(weddingCard);
+            model.Id = entity.Id;
+            model.EventName = entity.EventName;
+            model.EventDescription = entity.EventDescription;
+            model.EventDate = entity.EventDate;
+            model.EndDate = entity.EndDate;
+            model.UserId = entity.UserId;
+            model.Status = entity.Status;
+
             return model;
         }
-        public async Task<List<UserEventModel>> GetAllEventByUserIdAsync(int userId)
+        public async Task<DashboardModel> GetAllEventByUserIdAsync(int userId)
         {
             var eventList = await _eventService.GetEventListAsync(userId);
             var modelList = _mapper.Map<List<UserEventModel>>(eventList);
-            return modelList;
+
+            var dashboardList = new DashboardModel();
+            dashboardList.UserEventModelList = modelList;
+
+            dashboardList.DraftEventCount = modelList.Where(x => x.Status == "Draft").Count();
+            dashboardList.ActiveEventCount = modelList.Where(x => x.Status == "Active").Count();
+            dashboardList.CompletedEventCount = modelList.Where(x => x.Status == "Completed").Count();
+
+
+            return dashboardList;
         }
 
-        public async Task<UserEventModel> InsertUserEventAsync(UserEventModel userEventModel, int userId)
+        public async Task<UserEventModel> InsertUserEventAsync(UserEventModel userEventModel)
         {
             //insert main table
+            var paymentInformation = new PaymentInformation();
+            paymentInformation.Amount = 0;
+            paymentInformation.Status = "Pending";
+            paymentInformation.PaymentDate = DateTime.Now;
+            await _paymentService.InsertPayment(paymentInformation);
+
             var userEvent = new UserEvent();
             userEvent.EventName = userEventModel.EventName;
             userEvent.EventDescription = userEventModel.EventDescription;
             userEvent.EventDate = userEventModel.EventDate;
-            //userEvent.EndDate = userEventModel.EndDate;
+            userEvent.EndDate = userEventModel.EndDate;
             userEvent.PurgeDate = userEventModel.EventDate.AddDays(20);
-            userEvent.UserId = userId;
-            var model = await _eventService.InsertEvent(userEvent);
+            userEvent.UserId = userEventModel.UserId;
+            userEvent.Status = "Draft";
+            userEvent.PaymentInformationId = paymentInformation.Id;
+            await _eventService.InsertEvent(userEvent);
 
             // insert next table
             var weddingInfo = new WeddingCardInformation();
             weddingInfo.UserEventId = userEvent.Id;
+            weddingInfo.LocationName = userEventModel.LocationName;
             weddingInfo.BrideName = userEventModel.BrideName;
             weddingInfo.GroomName = userEventModel.GroomName;
-            weddingInfo.VenueName = userEventModel.VenueName;
             weddingInfo.Address1 = userEventModel.Address1;
             weddingInfo.Address2 = userEventModel.Address2;
             weddingInfo.Address3 = userEventModel.Address3;
@@ -60,9 +90,17 @@ namespace SetTheDate.ModelFactories
             weddingInfo.BrideFatherName = userEventModel.BrideFatherName;
             weddingInfo.BrideMotherName = userEventModel.BrideMotherName;
             weddingInfo.Wishes = userEventModel.Wishes;
-            weddingInfo.UserEventId = model.Id;
-
             await _eventService.InsertWeddingCardInformation(weddingInfo);
+
+            var contactInfoList = new List<ContactInformation>();
+
+            foreach (var contact in userEventModel.ContactInformations)
+            {
+                var contactEntity = _mapper.Map<ContactInformation>(contact);
+                contactEntity.WeddingCardInformationId = weddingInfo.Id;
+                contactInfoList.Add(contactEntity);
+            }
+            await _eventService.InsertContactInformationList(contactInfoList);
 
             return _mapper.Map<UserEventModel>(userEvent);
         }
@@ -86,22 +124,22 @@ namespace SetTheDate.ModelFactories
             var modelList = _mapper.Map<List<EventGuestModel>>(eventList);
             return modelList;
         }
-        public void InsertGuestListAsync(List<EventGuestModel> eventGuestList)
+        public async Task InsertGuestListAsync(List<EventGuestModel> eventGuestList)
         {
             var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
-            _eventService.InsertEventGuestListById(entities);
+            await _eventService.InsertEventGuestList(entities);
 
         }
         public void UpdateGuestListAsync(List<EventGuestModel> eventGuestList)
         {
             var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
-            _eventService.UpdateEventGuestListById(entities);
+            _eventService.UpdateEventGuestList(entities);
 
         }
         public void DeleteGuestListAsync(List<EventGuestModel> eventGuestList)
         {
             var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
-            _eventService.DeleteEventGuestListById(entities);
+            _eventService.DeleteEventGuestList(entities);
 
         }
 
@@ -144,21 +182,21 @@ namespace SetTheDate.ModelFactories
 
             return modelList;
         }
-        public async Task InsertEventQuestionListAsync(List<EventQuestionModel> eventQuestionModels, int eventId)
+        public async Task InsertEventQuestionListAsync(EventSurveySetup surverySetup)
         {
             //var entities = _mapper.Map<List<EventQuestion>>(eventQuestionModels);
-            foreach (var question in eventQuestionModels)
+            foreach (var question in surverySetup.EventQuestionListModel)
             {
-                var entity = _mapper.Map<EventQuestion>(eventQuestionModels);
-                entity.UserEventId = eventId;
-                //double confirm if this returns the id or not
-                _eventService.InsertEventQuestionById(entity);
+                var entity = _mapper.Map<EventQuestion>(question);
+                entity.UserEventId = surverySetup.UserEventId;
+                await _eventService.InsertEventQuestion(entity);
 
                 foreach (var answerModel in question.EventAnswerListModel)
                 {
                     var answerEntity = _mapper.Map<EventAnswer>(answerModel);
                     answerEntity.EventQuestionId = entity.Id;
-                    _eventService.InsertEventAnswer(answerEntity);
+                    answerEntity.EventId = surverySetup.UserEventId;
+                    await _eventService.InsertEventAnswer(answerEntity);
                 }
             }
 

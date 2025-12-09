@@ -34,7 +34,7 @@ public class UserEventModelValidator : AbstractValidator<UserEventModel>
         RuleFor(x => x.BrideMotherName)
             .NotEmpty().WithMessage("Bride mother name is required.");
 
-        RuleFor(x => x.VenueName)
+        RuleFor(x => x.LocationName)
             .NotEmpty().WithMessage("Venue name is required.");
 
         RuleFor(x => x.Address1)
