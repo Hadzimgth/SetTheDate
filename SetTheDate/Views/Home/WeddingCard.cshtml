@@ -13,59 +13,80 @@
 
 <style>
     .title-handwriting {
-        font-family: 'modernline', sans-serif;
+    font-family: 'modernline', sans-serif;
+    font-size: 100px;
+    text-align: center;
+    color: white;
+    font-weight: 600;
+    }
+
+    .other-handwriting {
         font-size: 100px;
         text-align: center;
         color: white;
-        font-weight: 600;
     }
 
     .card-container {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
     }
 
     .card-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-repeat: repeat;
-        pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: repeat;
+    pointer-events: none;
     }
 
     .border-left, .border-right {
-        position: absolute;
-        top: 0;
-        height: 100%;
-        width: 120px;
-        background-repeat: repeat-y;
-        background-size: contain;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 120px;
+    background-repeat: repeat-y;
+    background-size: contain;
     }
 
     .border-left {
-        left: 0;
+    left: 0;
     }
 
     .border-right {
-        right: 0;
+    right: 0;
     }
 
     .content-area {
-        position: relative;
-        z-index: 10;
-        margin-top: 120px;
-        text-align: center;
+    position: relative;
+    z-index: 10;
+    margin-top: 120px;
+    text-align: center;
     }
 
     .center-image {
-        display: block;
-        margin: 0 auto;
-        max-width: 10%;
+    display: block;
+    margin: 0 auto;
+    max-width: 10%;
     }
+
+    .wish-item {
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    }
+
+    .wish-item h4 {
+    font-size: 26px;
+    }
+
+    .wish-item p {
+    font-size: 18px;
+    line-height: 1.6;
+    }
+
 </style>
 <!DOCTYPE html>
 <html lang="en">
@@ -92,37 +113,48 @@
         <div class="content-area">
             <img src="@Url.Content("~/image/bismillah.png")" class="center-image" />
             <br />
-            <p>Meraikan 2 mempelai</p>
+            <p class="other-handwriting">Celebrating</p>
 
-            <h1 class="title-handwriting">Muhammad Hadzim</h1>
+            <br /><br />
+
+            <h1 class="title-handwriting">@Model.GroomName</h1>
             <h1 class="title-handwriting">&</h1>
-            <h1 class="title-handwriting">Wafa Rufaidah</h1>
+            <h1 class="title-handwriting">@Model.BrideName</h1>
 
-            <p>Daripada</p>
+            <br /><br />
+            <p class="other-handwriting">From</p>
+            <br /><br />
 
-            <h1 class="title-handwriting">@Model.GroomFatherName</h1>
-            <h1 class="title-handwriting">&</h1>
-            <h1 class="title-handwriting">@Model.GroomMotherName</h1>
+            <h1 class="other-handwriting">@Model.GroomFatherName</h1>
+            <h1 class="other-handwriting">&</h1>
+            <h1 class="other-handwriting">@Model.GroomMotherName</h1>
+            
+            <h1 class="other-handwriting">@Model.BrideFatherName</h1>
+            <h1 class="other-handwriting">&</h1>
+            <h1 class="other-handwriting">@Model.BrideMotherName</h1>
 
+            <br /><br />
+            <p class="other-handwriting">With all due respect</p>
+            <p class="other-handwriting">Sir/Madam</p>
+            <br /><br />
 
-            <h1 class="title-handwriting">@Model.BrideFatherName</h1>
-            <h1 class="title-handwriting">&</h1>
-            <h1 class="title-handwriting">@Model.BrideMotherName</h1>
+            <p>On</p>
 
-            <p>Dengan penuh rasa syukur ke hadrat ilahi, ingin  menjemput</p>
-            <p>Dato’/Datin, Tuan/Puan, Encik/Cik</p>
+            <h1 class="other-handwriting">@Model.LocationName</h1>
 
-            <p>Pada</p>
+            <h1 class="other-handwriting">@Model.TimeFrom - @Model.TimeTo</h1>
+            <br /><br />
 
-            <h1 class="title-handwriting">@Model.LocationName</h1>
+            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
 
-            <h1 class="title-handwriting">@Model.TimeFrom - @Model.TimeTo</h1>
+            <h1 class="other-handwriting">@Model.Wishes</h1>
+            
+            <br /><br />
+            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
+            <br />
 
-            <hr />
+            <h1 class="other-handwriting">Contacts:</h1>
 
-            <h1 class="title-handwriting">@Model.Wishes</h1>
-
-            <hr />
             @foreach (var contactPerson in Model.ContactInformations)
             {
                 <div class="row">
@@ -131,16 +163,105 @@
                     <p>@contactPerson.PhoneNumber</p>
                 </div>
             }
-            <hr />
 
-            <h1 class="title-handwriting">Leave your wishes here:</h1>
-            <textarea rows="4" cols="50" placeholder="Type your wishes..."></textarea>
+            <br /><br />
+            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
+            <br />
 
-            @* here need display the wishes *@
+            <h1 class="other-handwriting">Leave your wishes here:</h1>
 
+            <div class="card shadow-sm p-4 mx-auto mb-5" style="max-width: 500px;">
+                <div class="mb-3">
+                    <input type="text" id="guestName" class="form-control" placeholder="Your name" maxlength="100" />
+                </div>
+
+                <div class="mb-3">
+                    <textarea id="guestWish" class="form-control" rows="4" placeholder="Type your wishes..." maxlength="500"></textarea>
+                </div>
+
+                <button id="btnSaveWish" class="btn btn-primary w-100"> Send Wish 💖 </button>
+            </div>
+
+            <br /><br />
+            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
+            <br />
+
+            <h1 class="other-handwriting">Other Guest Wishes</h1>
+            @if (Model.GuestWishes != null && Model.GuestWishes.Any())
+            {
+                <div id="wishes-container">
+                    @for (int i = 0; i < Model.GuestWishes.Count; i++)
+                    {
+                        <div class="wish-item card shadow-sm mb-4 p-4 d-none"
+                        data-index="@i">
+
+                            <h4 class="fw-bold text-center mb-3">
+                                @Model.GuestWishes[i].Name
+                            </h4>
+
+                            <p class="text-center fst-italic mb-0">
+                                “@Model.GuestWishes[i].Wish”
+                            </p>
+                        </div>
+                    }
+                </div>
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center" id="wishes-pagination"></ul>
+                </nav>
+            }
+            else
+            {
+                <p class="text-center fst-italic text-light">
+                    Be the first to leave a wish 💖
+                </p>                
+            }
+            
+            <br /><br />
+            <br /><br />
         </div>
-
     </div>
-</body>
+    <script>
+        $(document).ready(function () {
+            const pageSize = 10;
+            const items = $('.wish-item');
+            const totalItems = items.length;
+            const totalPages = Math.ceil(totalItems / pageSize);
 
+            function showPage(page) {
+                items.addClass('d-none');
+
+                const start = (page - 1) * pageSize;
+                const end = start + pageSize;
+
+                items.slice(start, end).removeClass('d-none');
+
+                $('.pagination li').removeClass('active');
+                $('.pagination li[data-page="' + page + '"]').addClass('active');
+            }
+
+            function buildPagination() {
+                const pagination = $('#wishes-pagination');
+                pagination.empty();
+
+                for (let i = 1; i <= totalPages; i++) {
+                    pagination.append(`
+                        <li class="page-item" data-page="${i}">
+                            <a class="page-link" href="javascript:void(0)">${i}</a>
+                        </li>
+                    `);
+                }
+
+                $('.pagination li').first().addClass('active');
+            }
+
+            buildPagination();
+            showPage(1);
+
+            $(document).on('click', '.pagination li', function () {
+                const page = $(this).data('page');
+                showPage(page);
+            });
+        });
+    </script>
+</body>
 </html>

@@ -126,10 +126,9 @@ namespace SetTheDate.Controllers
         }
 
         [HttpGet]
-        public IActionResult WeddingCard()
+        public async Task<IActionResult> WeddingCard(int weddingCardId)
         {
-            var weddingCard = new WeddingCardInformationModel();
-            weddingCard.WeddingCardType = 1;
+            var weddingCard = await _eventModelFactory.GetWeddingCardByIdAsync(weddingCardId);
 
             return View(weddingCard);
         }

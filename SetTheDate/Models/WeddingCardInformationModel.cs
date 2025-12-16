@@ -7,6 +7,7 @@
             ContactInformations = new List<ContactInformationModel>();
             EventImages = new List<EventImageAttachmentModel>();
             GuestWishes = new List<GuestWishesModel>();
+            GuestWish = new GuestWishesModel();
         }
 
         public int Id { get; set; }
@@ -27,6 +28,7 @@
         public string LocationName { get; set; }
         public DateTime TimeFrom { get; set; }
         public DateTime TimeTo { get; set; }
+        public GuestWishesModel GuestWish { get; set; }
         public List<ContactInformationModel> ContactInformations { get; set; }
         public List<EventImageAttachmentModel> EventImages { get; set; }
         public List<GuestWishesModel> GuestWishes { get; set; }

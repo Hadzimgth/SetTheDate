@@ -41,7 +41,13 @@
                                     </label>
 
                                     <div class="form-check mb-1 answer-block">
-                                        <input class="form-control" name="EventQuestionListModel[@q].EventAnswerListModel[@a].Answer" value="@Model.EventQuestionListModel[q].EventAnswerListModel[a].Answer" />
+                                        <input class="form-control"
+                                               name="EventQuestionListModel[@q].EventAnswerListModel[@a].Answer"
+                                               value="@Model.EventQuestionListModel[q].EventAnswerListModel[a].Answer" />
+
+                                        <input type="hidden"
+                                               name="EventQuestionListModel[@q].EventAnswerListModel[@a].AnswerKeyword"
+                                               value="@(a + 1)" />
                                     </div>
                                 }
                             </div>
