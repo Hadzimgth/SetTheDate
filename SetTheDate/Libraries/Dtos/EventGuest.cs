@@ -8,6 +8,7 @@ namespace SetTheDate.Libraries.Dtos
         public string GuestName { get; set; }
         public string PhoneNumber { get; set; }
         public int UserEventId { get; set; }
+        public bool IsValid { get; set; }
 
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SetTheDate.Libraries.Dtos;
 using SetTheDate.Libraries.Repositories;
+using SetTheDate.Models;
 
 namespace SetTheDate.Libraries.Services
 {
@@ -37,7 +39,13 @@ namespace SetTheDate.Libraries.Services
             return await _userEventRepository.GetByIdAsync(id);
         }
 
-        public async Task<List<UserEvent>> GetEventListAsync(int userId)
+        public async Task<List<UserEvent>> GetAllEventListAsync()
+        {
+            var eventList = (await _userEventRepository.GetAllAsync()).ToList();
+
+            return eventList;
+        }
+        public async Task<List<UserEvent>> GetEventListByUserIdAsync(int userId)
         {
             var eventList = (await _userEventRepository.GetAllAsync()).Where(x => x.UserId == userId).ToList();
 
@@ -67,6 +75,10 @@ namespace SetTheDate.Libraries.Services
         {
             return (await _weddingCardInformationRepository.GetAllAsync()).Where(x => x.UserEventId == id).FirstOrDefault();
         }
+        public async Task<WeddingCardInformation> GetWeddingCardByIdAsync(int id)
+        {
+            return (await _weddingCardInformationRepository.GetAllAsync()).Where(x => x.Id == id).FirstOrDefault();
+        }
         public async Task<WeddingCardInformation> InsertWeddingCardInformation(WeddingCardInformation userWeddingCard)
         {
             _weddingCardInformationRepository.Add(userWeddingCard);
@@ -74,22 +86,33 @@ namespace SetTheDate.Libraries.Services
 
             return userWeddingCard;
         }
-        public async Task<WeddingCardInformation> UpdateWeddingCardInformation(WeddingCardInformation userWeddingCard)
+        public async Task<WeddingCardInformation> UpdateWeddingCardInformation(WeddingCardInformationModel userWeddingCard)
         {
-            _weddingCardInformationRepository.Update(userWeddingCard);
-            await _context.SaveChangesAsync();
+            var entity = await _context.WeddingCardInformation
+                .FirstOrDefaultAsync(x => x.Id == userWeddingCard.Id);
 
-            return userWeddingCard;
+            if (entity != null)
+            {
+                entity.WeddingCardType = userWeddingCard.WeddingCardType;
+                // update other fields if needed
+                await _context.SaveChangesAsync();
+            }
+
+            return entity;
         }
         public async Task DeleteWeddingCardInformation(WeddingCardInformation userWeddingCard)
         {
             _weddingCardInformationRepository.Delete(userWeddingCard);
             await _context.SaveChangesAsync();
         }
-
+        public async Task<EventGuest> GetGuestByPhoneNumber(string phoneNumber)
+        {
+            var guests = await _eventGuestRepository.GetAllAsync();
+            return guests.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
+        }
         public async Task<List<EventGuest>> GetEventGuestListByIEventdAsync(int eventId)
         {
-            var eventGuestList = (await _eventGuestRepository.GetAllAsync()).Where(x => x.UserEventId == eventId).ToList();
+            var eventGuestList = (await _eventGuestRepository.GetAllAsync()).Where(x => x.UserEventId == eventId && x.IsValid).ToList();
 
             return eventGuestList;
         }
@@ -109,6 +132,11 @@ namespace SetTheDate.Libraries.Services
                 _eventGuestRepository.Update(guest);
             }
 
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateEventGuest(EventGuest guest)
+        {
+            _eventGuestRepository.Update(guest);
             await _context.SaveChangesAsync();
         }
         public async Task DeleteEventGuestList(List<EventGuest> eventGuests)

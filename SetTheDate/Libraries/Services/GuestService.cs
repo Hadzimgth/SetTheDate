@@ -9,12 +9,23 @@ namespace SetTheDate.Libraries.Services
         public readonly WeddingCardInformationRepository _weddingCardInformationRepository;
         public readonly GuestWishesRepository _guestWishesRepository;
         public readonly ContactInformationRepository _contactInformationRepository;
+        public readonly EventGuestAnswerRepository _eventGuestAnswerRepository;
         private readonly ApplicationDbContext _context;
+        private readonly EventService _eventService;
 
-        public GuestService(WeddingCardInformationRepository weddingCardInformationRepository, ApplicationDbContext context)
+        public GuestService(WeddingCardInformationRepository weddingCardInformationRepository,
+            GuestWishesRepository guestWishesRepository,
+            ContactInformationRepository contactInformationRepository,
+            EventGuestAnswerRepository eventGuestAnswerRepository,
+            ApplicationDbContext context,
+            EventService eventservice)
         {
             _weddingCardInformationRepository = weddingCardInformationRepository;
+            _guestWishesRepository = guestWishesRepository;
+            _contactInformationRepository = contactInformationRepository;
+            _eventGuestAnswerRepository = eventGuestAnswerRepository;
             _context = context;
+            _eventService = eventservice;
         }
 
         public async Task<WeddingCardInformation> GetWeddingCardByEventIdAsync(int eventId)
@@ -76,6 +87,53 @@ namespace SetTheDate.Libraries.Services
         public async Task DeleteContactInformation(ContactInformation contact)
         {
             _contactInformationRepository.Delete(contact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<EventGuestAnswer>> GetEventGuestAnswerByEventId(int eventId)
+        {
+            var eventGuestsAnswers = await _eventGuestAnswerRepository.GetAllAsync();
+            return eventGuestsAnswers.Where(x => x.UserEventId == eventId).ToList();
+        }
+        public async Task<EventGuestAnswer> GetGuestanswerByGuestMobileNumberAndQuestionId(string MobileNumber, int questionId)
+        {
+            var guestId = (await _eventService.GetGuestByPhoneNumber(MobileNumber)).Id;
+
+            var guestAnswers = await _eventGuestAnswerRepository.GetAllAsync();
+            return guestAnswers.Where(x => x.EventGuestId == guestId && x.EventQuestionId == questionId).FirstOrDefault();
+        }
+        public async Task<EventGuestAnswer> GetGuestanswersByGuestMobileNumber(string MobileNumber)
+        {
+            var guestId = (await _eventService.GetGuestByPhoneNumber(MobileNumber)).Id;
+
+            var guestAnswers = await _eventGuestAnswerRepository.GetAllAsync();
+            return guestAnswers.Where(x => x.EventGuestId == guestId && x.EventAnswerId == 0).FirstOrDefault();
+        }
+        public async Task<bool> TryInsertGuestAnswer(EventGuestAnswer answer)
+        {
+            try
+            {
+                await InsertGuestAnswer(answer);
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
+        }
+        public async Task InsertGuestAnswer(EventGuestAnswer guestAnswer)
+        {
+            _eventGuestAnswerRepository.Add(guestAnswer);
+            await _context.SaveChangesAsync();
+        }
+        public async Task UpdateGuestAnswer(EventGuestAnswer guestAnswer)
+        {
+            _eventGuestAnswerRepository.Update(guestAnswer);
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeleteGuestAnswer(EventGuestAnswer guestAnswer)
+        {
+            _eventGuestAnswerRepository.Delete(guestAnswer);
             await _context.SaveChangesAsync();
         }
     }

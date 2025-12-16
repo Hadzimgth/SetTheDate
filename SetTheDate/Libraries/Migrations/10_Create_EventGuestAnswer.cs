@@ -29,13 +29,6 @@ namespace SetTheDate.Migrations
                     .ToTable("EventQuestion").PrimaryColumn("Id");
             }
 
-            if (Schema.Table("EventAnswer").Exists())
-            {
-                Create.ForeignKey("FK_EventGuestAnswer_EventAnswer")
-                    .FromTable("EventGuestAnswer").ForeignColumn("EventAnswerId")
-                    .ToTable("EventAnswer").PrimaryColumn("Id");
-            }
-
             if (Schema.Table("UserEvent").Exists())
             {
                 Create.ForeignKey("FK_EventGuestAnswer_UserEvent")

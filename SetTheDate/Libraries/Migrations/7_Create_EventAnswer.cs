@@ -10,6 +10,7 @@ namespace SetTheDate.Migrations
             Create.Table("EventAnswer")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("Answer").AsString(1000).NotNullable()
+                .WithColumn("AnswerKeyword").AsInt32().NotNullable()
                 .WithColumn("EventQuestionId").AsInt32().NotNullable()
                 .WithColumn("EventId").AsInt32().NotNullable();
 

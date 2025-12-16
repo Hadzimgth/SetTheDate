@@ -18,6 +18,7 @@
         public int GuestResponded { get; set; }
 
         //weddingcard info
+        public int WeddingCardId { get; set; }
         public string GroomName { get; set; }
         public string BrideName { get; set; }
         public string GroomFatherName { get; set; }

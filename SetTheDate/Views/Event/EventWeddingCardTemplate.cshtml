@@ -1,0 +1,66 @@
+﻿@model UserEventModel
+
+@{
+    ViewData["Title"] = "Event Wedding Card Selection";
+    // Determine the selected value: use model value or default to 1
+    var selectedType = Model.WeddingCardType == 1 || Model.WeddingCardType == 2 ? Model.WeddingCardType : 1;
+}
+
+<form asp-action="WeddingCardTemplateEdit" asp-controller="Event" method="post">
+
+    <div style="background-color:#a7c8ff; min-height:100vh;">
+        <div class="container py-4">
+            <div class="bg-white p-4 rounded-4 shadow-sm">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <input asp-for="WeddingCardId" type="hidden" />
+                <h3 class="fw-bold mb-4">Select Wedding Card Template:</h3>
+                <div class="d-flex gap-3">
+
+                    <!-- Option 1 -->
+                    <label class="card-template-option position-relative">
+                        <input type="radio" name="WeddingCardType" value="1" class="d-none" @(selectedType == 1 ? "checked" : "") />
+                        <img src="~/Image/Background_Template_1.png" class="img-thumbnail" style="width:200px; cursor:pointer;" />
+                        <span class="checkmark position-absolute top-0 start-0 badge bg-primary">✓</span>
+                    </label>
+
+                    <!-- Option 2 -->
+                    <label class="card-template-option position-relative">
+                        <input type="radio" name="WeddingCardType" value="2" class="d-none" @(selectedType == 2 ? "checked" : "") />
+                        <img src="~/Image/Background_Template_2.png" class="img-thumbnail" style="width:200px; cursor:pointer;" />
+                        <span class="checkmark position-absolute top-0 start-0 badge bg-primary">✓</span>
+                    </label>
+
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+    .card-template-option {
+        border: 2px solid transparent;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+    }
+
+        /* Hide checkmark initially */
+        .card-template-option .checkmark {
+            display: none;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+        /* Show border + checkmark when selected */
+        .card-template-option input:checked + img {
+            border: 3px solid #0d6efd;
+            border-radius: 8px;
+        }
+
+        .card-template-option input:checked ~ .checkmark {
+            display: inline-block;
+        }
+</style>

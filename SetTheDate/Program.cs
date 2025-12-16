@@ -1,6 +1,7 @@
 using FluentMigrator.Runner;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using SetTheDate.BackgroundWorkers;
 using SetTheDate.Libraries;
 using SetTheDate.Libraries.Repositories;
 using SetTheDate.Libraries.Services;
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
+
 builder.Services.AddAutoMapper(cfg => { }, typeof(ModelMapper).Assembly);
 
 // --- DbContext ---
@@ -44,6 +46,16 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+//backgroundworkers
+builder.Services.AddHostedService<SendSurveyWorker>();
+
+//client
+builder.Services.AddHttpClient<WasenderClient>(client =>
+{
+    client.BaseAddress = new Uri("https://www.wasenderapi.com/api/send-message");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 // --- Repositories ---
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<ContactInformationRepository>();
@@ -64,6 +76,8 @@ builder.Services.AddScoped<EventService>();
 builder.Services.AddScoped<GuestService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<SettingService>();
+builder.Services.AddScoped<WhatsAppService>();
 
 // --- Model Factories ---
 builder.Services.AddScoped<UserModelFactory>();

@@ -27,7 +27,8 @@ namespace SetTheDate.Controllers
             var userEvent = new UserEventModel
             {
                 UserId = userId,
-                EventDate = DateTime.Now
+                EventDate = DateTime.Now.AddMonths(3),
+                EndDate = DateTime.Now.AddMonths(4),
             };
 
             if(eventId.HasValue && eventId > 0)
@@ -42,25 +43,55 @@ namespace SetTheDate.Controllers
         public async Task<IActionResult> Create(UserEventModel userEvent)
         {
             var userEventModel = await _eventModelFactory.InsertUserEventAsync(userEvent);
+                        
+            return RedirectToAction("EventWeddingCardTemplate", new { id = userEventModel.Id });
+        }
 
-            return RedirectToAction("GuestQuestion", new { id = userEventModel.Id });
+        [HttpPost]
+        public async Task<IActionResult> Edit(UserEventModel userEvent)
+        {
+            var userEventModel = await _eventModelFactory.UpdateUserEventAsync(userEvent);
+            return View(userEventModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EventWeddingCardTemplate(int? id)
+        {
+            var userEvent = await _eventModelFactory.GetEventAndWeddingCardByIdAsync(id.Value);
+            return View(userEvent);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> WeddingCardTemplateEdit(UserEventModel userEvent)
+        {
+            var weddingCard = await _eventModelFactory.GetWeddingCardByIdAsync(userEvent.WeddingCardId);
+
+            weddingCard.WeddingCardType = userEvent.WeddingCardType;
+
+            await _eventModelFactory.UpdateWeddingCardAsync(weddingCard);
+
+            return RedirectToAction("GuestQuestion", new { id = weddingCard.Id });
         }
 
         [HttpGet]
         public async Task<IActionResult> GuestQuestion(int id)
         {
+            var eventModel = await _eventModelFactory.GetEventAndWeddingCardByIdAsync(id);
+
             var eventSurvey = new EventSurveySetup();
             eventSurvey.UserEventId = id;
+
+
             var answerList = new List<EventAnswerModel>();
             var answer = new EventAnswerModel();
-            answer.Answer = "Nasi Ayam";
+            answer.Answer = "1. Yes";
             answerList.Add(answer);
             answer = new EventAnswerModel();
-            answer.Answer = "Nasi Goreng";
+            answer.Answer = "2. No";
             answerList.Add(answer);
 
             var eventQuestionModel = new EventQuestionModel();
-            eventQuestionModel.Question = "What would you like to have at the wedding?";
+            eventQuestionModel.Question = $"you are invited to {eventModel.BrideName} & {eventModel.GroomName} on {eventModel.EventDate}. Would you be able to participate? \nPlease answer based on the numbers only.";
             eventQuestionModel.EventAnswerListModel = answerList;
 
             eventSurvey.EventQuestionListModel.Add(eventQuestionModel);
@@ -85,12 +116,6 @@ namespace SetTheDate.Controllers
             return View(guestSetup);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(UserEventModel userEvent)
-        {
-            var userEventModel = await _eventModelFactory.UpdateUserEventAsync(userEvent);
-            return View(userEventModel);
-        }
 
         [HttpPost]
         public async Task<IActionResult> GuestSetup(EventGuestListModel model)

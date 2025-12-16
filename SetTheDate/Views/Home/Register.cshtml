@@ -27,6 +27,9 @@
                 <h5 class="mb-4 fw-semibold text-center">Login</h5>
                 <form asp-action="Register" asp-controller="Home" method="post">
                     <div class="mb-3">
+                        <input type="text" asp-for="Name" class="form-control" placeholder="Name" />
+                    </div>
+                    <div class="mb-3">
                         <input type="text" asp-for="Email" class="form-control" placeholder="Email" />
                     </div>
                     <div class="mb-3 position-relative">
