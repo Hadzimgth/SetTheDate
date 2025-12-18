@@ -27,7 +27,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: hadzim/setthedate:latest
+          tags: idiahouse/setthedate:latest
           
       # - name: Deploy to VPS
       #   uses: appleboy/ssh-action@v1.0.3
