@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace SetTheDate.Controllers
     public class EventController: Controller
     {
         private readonly EventModelFactory _eventModelFactory;
+        private readonly IValidator<UserEventModel> _userEventModelValidator;
 
-        public EventController(EventModelFactory eventModelFactory)
+        public EventController(EventModelFactory eventModelFactory, IValidator<UserEventModel> userEventModelValidator)
         {
             _eventModelFactory = eventModelFactory;
+            _userEventModelValidator = userEventModelValidator;
         }
 
         [HttpGet]
@@ -29,6 +32,7 @@ namespace SetTheDate.Controllers
                 UserId = userId,
                 EventDate = DateTime.Now.AddMonths(3),
                 EndDate = DateTime.Now.AddMonths(4),
+                Status = "Draft"
             };
 
             if(eventId.HasValue && eventId > 0)
@@ -42,6 +46,18 @@ namespace SetTheDate.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserEventModel userEvent)
         {
+            var validationResult = await _userEventModelValidator.ValidateAsync(userEvent);
+
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                userEvent.IsEdit = false;
+                return View("EventSetup", userEvent);
+            }
+
             var userEventModel = await _eventModelFactory.InsertUserEventAsync(userEvent);
                         
             return RedirectToAction("EventWeddingCardTemplate", new { id = userEventModel.Id });
@@ -50,8 +66,19 @@ namespace SetTheDate.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(UserEventModel userEvent)
         {
+            var validationResult = await _userEventModelValidator.ValidateAsync(userEvent);
+
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View("EventSetup", userEvent);
+            }
+
             var userEventModel = await _eventModelFactory.UpdateUserEventAsync(userEvent);
-            return View(userEventModel);
+            return RedirectToAction("EventWeddingCardTemplate", new { id = userEventModel.Id });
         }
 
         [HttpGet]
@@ -70,7 +97,7 @@ namespace SetTheDate.Controllers
 
             await _eventModelFactory.UpdateWeddingCardAsync(weddingCard);
 
-            return RedirectToAction("GuestQuestion", new { id = weddingCard.Id });
+            return RedirectToAction("GuestQuestion", new { id = weddingCard.UserEventId });
         }
 
         [HttpGet]
@@ -112,6 +139,13 @@ namespace SetTheDate.Controllers
         {
             var guestSetup = new EventGuestListModel();
             guestSetup.UserEventId = id;
+
+            // Load existing guests if any
+            var existingGuests = await _eventModelFactory.GetAllEventGuestListByEventIdAsync(id);
+            if (existingGuests != null && existingGuests.Any())
+            {
+                guestSetup.eventGuestList = existingGuests;
+            }
 
             return View(guestSetup);
         }
@@ -180,8 +214,21 @@ namespace SetTheDate.Controllers
         [HttpGet]
         public async Task<IActionResult> EventSetupSummary(int id)
         {
+            var userEvent = await _eventModelFactory.GetEventByIdAsync(id);
+            var questionList = await _eventModelFactory.GetAllEventQuestionListByEventIdAsync(id);
+
+            ViewBag.TotalGuest = userEvent?.TotalGuest ?? 0;
+            ViewBag.QuestionCount = questionList?.Count ?? 0;
+            ViewBag.EventId = id;
 
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MakePayment(int id)
+        {
+            await _eventModelFactory.MarkEventAsOngoingAsync(id);
+            return RedirectToAction("Dashboard", "Home");
         }
         public IActionResult DownloadGuestTemplate()
         {

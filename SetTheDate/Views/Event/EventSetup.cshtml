@@ -17,6 +17,9 @@
                     <h5 class="fw-semibold mb-3">Event Setup:</h5>
                     <input type="hidden" asp-for="UserId" />
                     <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Status" />
+                    <input type="hidden" asp-for="WeddingCardType" />
+                    <input type="hidden" asp-for="WeddingCardId" />
                     <div class="mb-3">
                         <label for="EventName" class="form-label fw-medium">Event Name</label>
                         <input type="text" class="form-control" asp-for="EventName" />
@@ -121,7 +124,10 @@
                         <input type="text" class="form-control" asp-for="State" />
                         <span asp-validation-for="State" class="text-danger"></span>
                     </div>
-                    <br/>
+                    
+                    <div class="mb-3">
+                        <h5 class="fw-semibold mb-3">Contact Person:</h5>
+                    </div>
 
                     <table class="table table-bordered" id="contactTable">
                         <thead class="table-light">
@@ -136,15 +142,21 @@
                         <tbody>
                             @for (int i = 0; i < Model.ContactInformations.Count; i++)
                             {
+                                var contact = Model.ContactInformations[i];
                                 <tr>
                                     <td>
-                                        <input asp-for="ContactInformations[@i].Name" class="form-control" />
+                                        <input type="hidden" name="ContactInformations[@i].Id" value="@contact.Id" />
+                                        <input type="hidden" name="ContactInformations[@i].WeddingCardInformationId" value="@contact.WeddingCardInformationId" />
+                                        <input type="text" name="ContactInformations[@i].Name" class="form-control" value="@contact.Name" data-val="true" data-val-required="Name is required." data-val-maxlength="Name cannot exceed 100 characters." data-val-maxlength-max="100" />
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[@i].Name" data-valmsg-replace="true"></span>
                                     </td>
                                     <td>
-                                        <input asp-for="ContactInformations[@i].FamilyRole" class="form-control" />
+                                        <input type="text" name="ContactInformations[@i].FamilyRole" class="form-control" value="@contact.FamilyRole" data-val="true" data-val-required="Family role is required." data-val-maxlength="Family role cannot exceed 50 characters." data-val-maxlength-max="50" />
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[@i].FamilyRole" data-valmsg-replace="true"></span>
                                     </td>
                                     <td>
-                                        <input asp-for="ContactInformations[@i].PhoneNumber" class="form-control" />
+                                        <input type="text" name="ContactInformations[@i].PhoneNumber" class="form-control phone-input" value="@contact.PhoneNumber" data-val="true" data-val-required="Phone number is required." />
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[@i].PhoneNumber" data-valmsg-replace="true"></span>
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
@@ -165,47 +177,128 @@
     </div>
 
     <script>
-        let rowIndex = @Model.ContactInformations.Count;
+        (function() {
+            let rowIndex = @(Model.ContactInformations?.Count ?? 0);
+            const contactTable = document.getElementById('contactTable');
+            const tbody = contactTable ? contactTable.querySelector('tbody') : null;
 
-        document.getElementById("addRowBtn").addEventListener("click", function () {
-
-            let tableBody = document.querySelector("#contactTable tbody");
-
-            let newRow = document.createElement("tr");
-
-            newRow.innerHTML = `
-                <td><input name="ContactInformations[${rowIndex}].Name" class="form-control" /></td>
-                <td><input name="ContactInformations[${rowIndex}].FamilyRole" class="form-control" /></td>
-                <td><input name="ContactInformations[${rowIndex}].PhoneNumber" class="form-control" /></td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
-                </td>
-            `;
-
-            tableBody.appendChild(newRow);
-
-            rowIndex++;
-        });
-
-        document.addEventListener("click", function (e) {
-            if (e.target.classList.contains("remove-row")) {
-                e.target.closest("tr").remove();
+            // Phone number validation: must start with 6 and be 8-15 digits
+            function validatePhoneNumber(number) {
+                if (!number || typeof number !== 'string') return false;
+                const trimmed = number.trim();
+                return /^6\d{7,14}$/.test(trimmed);
             }
-        });
 
-        flatpickr("#EventDate", {
-            enableTime: false,
-            altInput: true,
-            altFormat: "d/m/Y",
-            dateFormat: "Y-m-d"
-        });
+            // Update phone input styling
+            function updatePhoneValidation(phoneInput) {
+                if (!phoneInput || !phoneInput.classList.contains('phone-input')) return;
 
-        flatpickr("#EndDate", {
-            enableTime: false,
-            altInput: true,
-            altFormat: "d/m/Y",
-            dateFormat: "Y-m-d"
-        });
+                const phone = phoneInput.value || '';
+                const isValid = validatePhoneNumber(phone);
+
+                // Update input styling
+                if (phone.trim() === '') {
+                    phoneInput.classList.remove('is-invalid', 'is-valid');
+                } else if (isValid) {
+                    phoneInput.classList.remove('is-invalid');
+                    phoneInput.classList.add('is-valid');
+                } else {
+                    phoneInput.classList.remove('is-valid');
+                    phoneInput.classList.add('is-invalid');
+                }
+
+                // Update validation message
+                const validationSpan = phoneInput.closest('td').querySelector('span[data-valmsg-for]');
+                if (validationSpan && phone.trim() !== '') {
+                    if (!isValid) {
+                        validationSpan.textContent = 'Invalid phone number. Must start with 6 and be 8-15 digits.';
+                        validationSpan.classList.remove('field-validation-valid');
+                        validationSpan.classList.add('field-validation-error');
+                    } else {
+                        validationSpan.textContent = '';
+                        validationSpan.classList.remove('field-validation-error');
+                        validationSpan.classList.add('field-validation-valid');
+                    }
+                }
+            }
+
+            // Validate all phone inputs on page load
+            function validateAllPhones() {
+                if (!tbody) return;
+                const phoneInputs = tbody.querySelectorAll('.phone-input');
+                phoneInputs.forEach(updatePhoneValidation);
+            }
+
+            // Initialize validation on page load
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', validateAllPhones);
+            } else {
+                validateAllPhones();
+            }
+
+            // Event delegation for input events (works for dynamically added rows)
+            if (tbody) {
+                tbody.addEventListener('input', function (e) {
+                    updatePhoneValidation(e.target);
+                });
+
+                // Handle blur event for better UX
+                tbody.addEventListener('blur', function (e) {
+                    if (e.target.classList.contains('phone-input')) {
+                        updatePhoneValidation(e.target);
+                    }
+                }, true);
+            }
+
+            document.getElementById("addRowBtn").addEventListener("click", function () {
+                if (!tbody) return;
+
+                let newRow = document.createElement("tr");
+
+                newRow.innerHTML = `
+                    <td>
+                        <input type="hidden" name="ContactInformations[${rowIndex}].Id" value="0" />
+                        <input type="hidden" name="ContactInformations[${rowIndex}].WeddingCardInformationId" value="0" />
+                        <input name="ContactInformations[${rowIndex}].Name" class="form-control" data-val="true" data-val-required="Name is required." data-val-maxlength="Name cannot exceed 100 characters." data-val-maxlength-max="100" />
+                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[${rowIndex}].Name" data-valmsg-replace="true"></span>
+                    </td>
+                    <td>
+                        <input name="ContactInformations[${rowIndex}].FamilyRole" class="form-control" data-val="true" data-val-required="Family role is required." data-val-maxlength="Family role cannot exceed 50 characters." data-val-maxlength-max="50" />
+                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[${rowIndex}].FamilyRole" data-valmsg-replace="true"></span>
+                    </td>
+                    <td>
+                        <input name="ContactInformations[${rowIndex}].PhoneNumber" class="form-control phone-input" data-val="true" data-val-required="Phone number is required." />
+                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[${rowIndex}].PhoneNumber" data-valmsg-replace="true"></span>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                    </td>
+                `;
+
+                tbody.appendChild(newRow);
+                rowIndex++;
+            });
+
+            document.addEventListener("click", function (e) {
+                if (e.target.classList.contains("remove-row")) {
+                    e.target.closest("tr").remove();
+                }
+            });
+
+            flatpickr("#EventDate", {
+                enableTime: false,
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d"
+            });
+
+            flatpickr("#EndDate", {
+                enableTime: false,
+                altInput: true,
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d"
+            });
+        })();
     </script>
 
 </form>

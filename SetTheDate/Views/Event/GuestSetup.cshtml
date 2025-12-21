@@ -73,6 +73,7 @@
                                             <td>
                                                 <button type="button" class="btn btn-danger btn-sm remove-row">Delete</button>
                                             </td>
+                                            <input type="hidden" name="eventGuestList[@i].Id" value="@guest.Id" />
                                             <input type="hidden" name="eventGuestList[@i].UserEventId" value="@Model.UserEventId" />
                                         </tr>
                                     }
@@ -96,34 +97,93 @@
                 </div>
 
                 <script>
-                    let guestIndex = @Model.eventGuestList?.Count ?? 0;
+                    (function() {
+                        let guestIndex = @Model.eventGuestList?.Count ?? 0;
+                        const guestTable = document.getElementById('guestTable');
+                        const tbody = guestTable ? guestTable.querySelector('tbody') : null;
 
-                    // Phone number validation: must start with 6 and be 8-15 digits
-                    function validatePhoneNumber(number) {
-                        return /^6\d{7,14}$/.test(number.trim());
-                    }
+                        // Phone number validation: must start with 6 and be 8-15 digits
+                        function validatePhoneNumber(number) {
+                            if (!number || typeof number !== 'string') return false;
+                            const trimmed = number.trim();
+                            return /^6\d{7,14}$/.test(trimmed);
+                        }
 
-                    // Update validity badge on phone number change
-                    document.querySelector('#guestTable tbody').addEventListener('input', function (e) {
-                        if (e.target.classList.contains('phone-input')) {
-                            const row = e.target.closest('tr');
-                            const phone = e.target.value;
+                        // Update validity badge and input styling
+                        function updatePhoneValidation(phoneInput) {
+                            if (!phoneInput || !phoneInput.classList.contains('phone-input')) return;
+
+                            const row = phoneInput.closest('tr');
+                            if (!row) return;
+
+                            const phone = phoneInput.value || '';
                             const isValid = validatePhoneNumber(phone);
 
+                            // Update badge
                             const badge = row.querySelector('.is-valid-badge');
-                            badge.textContent = isValid ? "Active" : "No";
-                            badge.className = 'badge ' + (isValid ? 'bg-success is-valid-badge' : 'bg-danger is-valid-badge');
+                            if (badge) {
+                                badge.textContent = isValid ? "Active" : "No";
+                                badge.className = 'badge ' + (isValid ? 'bg-success is-valid-badge' : 'bg-danger is-valid-badge');
+                            }
 
+                            // Update hidden input
                             const hiddenInput = row.querySelector('.is-valid-input');
-                            hiddenInput.value = isValid.toString();
+                            if (hiddenInput) {
+                                hiddenInput.value = isValid.toString();
+                            }
+
+                            // Update input styling
+                            if (phone.trim() === '') {
+                                phoneInput.classList.remove('is-invalid', 'is-valid');
+                            } else if (isValid) {
+                                phoneInput.classList.remove('is-invalid');
+                                phoneInput.classList.add('is-valid');
+                            } else {
+                                phoneInput.classList.remove('is-valid');
+                                phoneInput.classList.add('is-invalid');
+                            }
                         }
-                    });
 
-                    // Add new row
-                    document.getElementById('addRowBtn').addEventListener('click', function () {
-                        const tbody = document.querySelector('#guestTable tbody');
-                        const row = document.createElement('tr');
+                        // Validate all phone inputs on page load
+                        function validateAllPhones() {
+                            if (!tbody) return;
+                            const phoneInputs = tbody.querySelectorAll('.phone-input');
+                            phoneInputs.forEach(updatePhoneValidation);
+                        }
 
+                        // Initialize validation on page load
+                        document.addEventListener('DOMContentLoaded', function() {
+                            validateAllPhones();
+                        });
+
+                        // Also run immediately if DOM is already loaded
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', validateAllPhones);
+                        } else {
+                            validateAllPhones();
+                        }
+
+                        // Event delegation for input events (works for dynamically added rows)
+                        if (tbody) {
+                            tbody.addEventListener('input', function (e) {
+                                updatePhoneValidation(e.target);
+                            });
+
+                            // Handle blur event for better UX
+                            tbody.addEventListener('blur', function (e) {
+                                if (e.target.classList.contains('phone-input')) {
+                                    updatePhoneValidation(e.target);
+                                }
+                            }, true);
+                        }
+
+                        // Add new row
+                        const addRowBtn = document.getElementById('addRowBtn');
+                        if (addRowBtn) {
+                            addRowBtn.addEventListener('click', function () {
+                                if (!tbody) return;
+
+                                const row = document.createElement('tr');
                         row.innerHTML = `
                             <td class="row-number">${guestIndex + 1}</td>
                             <td><input type="text" name="eventGuestList[${guestIndex}].GuestName" class="form-control" /></td>
@@ -135,34 +195,44 @@
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm remove-row">Delete</button>
                             </td>
+                            <input type="hidden" name="eventGuestList[${guestIndex}].Id" value="0" />
                             <input type="hidden" name="eventGuestList[${guestIndex}].UserEventId" value="@Model.UserEventId" />
                         `;
 
-                        tbody.appendChild(row);
-                        guestIndex++;
-                        updateRowNumbers();
-                    });
-
-                    // Delete row
-                    document.querySelector('#guestTable tbody').addEventListener('click', function (e) {
-                        if (e.target.classList.contains('remove-row')) {
-                            e.target.closest('tr').remove();
-                            updateRowNumbers();
+                                tbody.appendChild(row);
+                                guestIndex++;
+                                updateRowNumbers();
+                            });
                         }
-                    });
 
-                    // Update row numbers and input names for model binding
-                    function updateRowNumbers() {
-                        document.querySelectorAll('#guestTable tbody tr').forEach((tr, index) => {
-                            tr.querySelector('.row-number').textContent = index + 1;
-                            tr.querySelectorAll('input, select').forEach(input => {
-                                if (input.name) {
-                                    input.name = input.name.replace(/\[\d+\]/, `[${index}]`);
+                        // Delete row - use event delegation
+                        if (tbody) {
+                            tbody.addEventListener('click', function (e) {
+                                if (e.target.classList.contains('remove-row')) {
+                                    e.target.closest('tr').remove();
+                                    updateRowNumbers();
                                 }
                             });
-                        });
-                        guestIndex = document.querySelectorAll('#guestTable tbody tr').length;
-                    }
+                        }
+
+                        // Update row numbers and input names for model binding
+                        function updateRowNumbers() {
+                            if (!tbody) return;
+                            const rows = tbody.querySelectorAll('tr');
+                            rows.forEach((tr, index) => {
+                                const rowNumber = tr.querySelector('.row-number');
+                                if (rowNumber) {
+                                    rowNumber.textContent = index + 1;
+                                }
+                                tr.querySelectorAll('input, select').forEach(input => {
+                                    if (input.name) {
+                                        input.name = input.name.replace(/\[\d+\]/, `[${index}]`);
+                                    }
+                                });
+                            });
+                            guestIndex = rows.length;
+                        }
+                    })();
                 </script>
 
                 @if (Model?.eventGuestList != null && Model.eventGuestList.Any())
