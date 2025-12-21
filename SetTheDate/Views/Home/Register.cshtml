@@ -24,33 +24,185 @@
         <!-- Right section -->
         <div class="col-md-6 d-flex align-items-center justify-content-center bg-white">
             <div style="width: 350px;">
-                <h5 class="mb-4 fw-semibold text-center">Login</h5>
+                <h5 class="mb-4 fw-semibold text-center">Register</h5>
                 <form asp-action="Register" asp-controller="Home" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
                     <div class="mb-3">
                         <input type="text" asp-for="Name" class="form-control" placeholder="Name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <input type="text" asp-for="Email" class="form-control" placeholder="Email" />
+                        <input type="email" asp-for="Email" class="form-control" placeholder="Email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
                     <div class="mb-3 position-relative">
-                        <input asp-for="Password" type="password" class="form-control" placeholder="Enter password" />
+                        <input asp-for="Password" type="password" class="form-control" id="passwordInput" placeholder="Enter password" />
                         <i class="fa-solid fa-eye position-absolute end-0 top-50 translate-middle-y me-3 text-muted" style="cursor: pointer;"></i>
+                        <div class="mt-2">
+                            <div class="password-strength-container">
+                                <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                            </div>
+                            <small class="text-muted" id="passwordStrengthText">Password strength</small>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
                     <div class="mb-3 position-relative">
-                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Enter confirmation password" />
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" id="confirmPasswordInput" placeholder="Enter confirmation password" />
                         <i class="fa-solid fa-eye position-absolute end-0 top-50 translate-middle-y me-3 text-muted" style="cursor: pointer;"></i>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
                         <input type="text" asp-for="PhoneNumber" class="form-control" placeholder="Phone" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
 
-
-
-
-
-                    <button type="submit" class="btn w-100 text-white" style="background-color: #307CFF;">Register</button>
+                    <button type="submit" class="btn w-100 text-white" id="registerButton" style="background-color: #307CFF;" disabled>Register</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <style>
+        .password-strength-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .password-strength-weak {
+            background-color: #dc3545;
+        }
+
+        .password-strength-medium {
+            background-color: #ffc107;
+        }
+
+        .password-strength-strong {
+            background-color: #28a745;
+        }
+
+        #registerButton:disabled {
+            background-color: #cccccc !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            const passwordInput = $('#passwordInput');
+            const confirmPasswordInput = $('#confirmPasswordInput');
+            const strengthBar = $('#passwordStrengthBar');
+            const strengthText = $('#passwordStrengthText');
+            const registerButton = $('#registerButton');
+
+            function checkPasswordStrength(password) {
+                if (!password) {
+                    return { strength: 0, percentage: 0, text: 'Password strength' };
+                }
+
+                let score = 0;
+
+                // Check length (minimum 6 characters)
+                if (password.length >= 6) {
+                    score += 25;
+                }
+
+                // Check for capital letter
+                if (/[A-Z]/.test(password)) {
+                    score += 25;
+                }
+
+                // Check for number
+                if (/[0-9]/.test(password)) {
+                    score += 25;
+                }
+
+                // Check for special character
+                if (/[^A-Za-z0-9]/.test(password)) {
+                    score += 25;
+                }
+
+                let strengthClass = '';
+                let text = '';
+
+                if (score === 0) {
+                    text = 'Password strength';
+                } else if (score === 25) {
+                    strengthClass = 'password-strength-weak';
+                    text = 'Weak - Add capital letter, number, or special character';
+                } else if (score === 50) {
+                    strengthClass = 'password-strength-medium';
+                    text = 'Medium - Add more requirements';
+                } else if (score === 75) {
+                    strengthClass = 'password-strength-medium';
+                    text = 'Good - Almost there';
+                } else if (score === 100) {
+                    strengthClass = 'password-strength-strong';
+                    text = 'Strong password';
+                }
+
+                return {
+                    strength: score,
+                    percentage: score,
+                    text: text,
+                    class: strengthClass,
+                    isMaximum: score === 100
+                };
+            }
+
+            function checkFormValidation() {
+                const password = passwordInput.val();
+                const confirmPassword = confirmPasswordInput.val();
+                const passwordResult = checkPasswordStrength(password);
+                const passwordsMatch = password && confirmPassword && password === confirmPassword;
+
+                // Enable/disable register button based on password strength and confirmation
+                if (passwordResult.isMaximum && passwordsMatch) {
+                    registerButton.prop('disabled', false);
+                } else {
+                    registerButton.prop('disabled', true);
+                }
+            }
+
+            passwordInput.on('input', function () {
+                const password = $(this).val();
+                const result = checkPasswordStrength(password);
+
+                strengthBar.css('width', result.percentage + '%');
+                strengthBar.removeClass('password-strength-weak password-strength-medium password-strength-strong');
+                if (result.class) {
+                    strengthBar.addClass(result.class);
+                }
+                strengthText.text(result.text);
+
+                checkFormValidation();
+            });
+
+            confirmPasswordInput.on('input', function () {
+                checkFormValidation();
+            });
+
+            // Toggle password visibility
+            $('.fa-eye').on('click', function () {
+                const input = $(this).siblings('input');
+                const type = input.attr('type') === 'password' ? 'text' : 'password';
+                input.attr('type', type);
+                $(this).toggleClass('fa-eye fa-eye-slash');
+            });
+        });
+    </script>
+}
