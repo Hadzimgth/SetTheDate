@@ -14,9 +14,6 @@ builder.Services.AddControllersWithViews()
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(ModelMapper).Assembly);
 
-// --- DbContext ---
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseInMemoryDatabase("TempDb"));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("ConnectionString");
@@ -102,20 +99,17 @@ using (var scope = app.Services.CreateScope())
     var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
     runner.MigrateUp();
 }
-
 // --- Middleware ---
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
