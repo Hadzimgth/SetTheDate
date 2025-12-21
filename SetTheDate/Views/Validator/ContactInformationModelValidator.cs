@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using PhoneNumbers;
 using SetTheDate.Models;
 
 public class ContactInformationModelValidator : AbstractValidator<ContactInformationModel>
@@ -15,8 +16,26 @@ public class ContactInformationModelValidator : AbstractValidator<ContactInforma
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage("Phone number is required.")
-            .Matches(@"^\+?[0-9\s\-]{7,20}$")
-            .WithMessage("Phone number format is invalid.");
+            .Must(phoneNumber => ValidatePhoneNumber(phoneNumber))
+            .WithMessage("Invalid phone number format. Please enter a valid mobile number.");
+    }
 
+    private bool ValidatePhoneNumber(string mobile)
+    {
+        if (string.IsNullOrWhiteSpace(mobile))
+            return false;
+
+        try
+        {
+            var phoneUtil = PhoneNumberUtil.GetInstance();
+            var number = phoneUtil.Parse(mobile, "MY");
+
+            return phoneUtil.IsValidNumber(number) &&
+                   phoneUtil.GetNumberType(number) == PhoneNumberType.MOBILE;
+        }
+        catch (NumberParseException)
+        {
+            return false;
+        }
     }
 }

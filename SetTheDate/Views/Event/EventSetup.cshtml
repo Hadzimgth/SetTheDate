@@ -121,7 +121,10 @@
                         <input type="text" class="form-control" asp-for="State" />
                         <span asp-validation-for="State" class="text-danger"></span>
                     </div>
-                    <br/>
+                    
+                    <div class="mb-3">
+                        <h5 class="fw-semibold mb-3">Contact Person:</h5>
+                    </div>
 
                     <table class="table table-bordered" id="contactTable">
                         <thead class="table-light">
@@ -139,12 +142,15 @@
                                 <tr>
                                     <td>
                                         <input asp-for="ContactInformations[@i].Name" class="form-control" />
+                                        <span asp-validation-for="ContactInformations[@i].Name" class="text-danger"></span>
                                     </td>
                                     <td>
                                         <input asp-for="ContactInformations[@i].FamilyRole" class="form-control" />
+                                        <span asp-validation-for="ContactInformations[@i].FamilyRole" class="text-danger"></span>
                                     </td>
                                     <td>
                                         <input asp-for="ContactInformations[@i].PhoneNumber" class="form-control" />
+                                        <span asp-validation-for="ContactInformations[@i].PhoneNumber" class="text-danger"></span>
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-danger btn-sm remove-row">X</button>

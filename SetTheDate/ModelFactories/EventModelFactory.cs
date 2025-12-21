@@ -74,7 +74,7 @@ namespace SetTheDate.ModelFactories
             dashboardList.UserEventModelList = modelList;
 
             dashboardList.DraftEventCount = modelList.Where(x => x.Status == "Draft").Count();
-            dashboardList.ActiveEventCount = modelList.Where(x => x.Status == "Active").Count();
+            dashboardList.ActiveEventCount = modelList.Where(x => x.Status == "Ongoing").Count();
             dashboardList.CompletedEventCount = modelList.Where(x => x.Status == "Completed").Count();
 
 

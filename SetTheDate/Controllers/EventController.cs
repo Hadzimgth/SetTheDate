@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace SetTheDate.Controllers
     public class EventController: Controller
     {
         private readonly EventModelFactory _eventModelFactory;
+        private readonly IValidator<UserEventModel> _userEventModelValidator;
 
-        public EventController(EventModelFactory eventModelFactory)
+        public EventController(EventModelFactory eventModelFactory, IValidator<UserEventModel> userEventModelValidator)
         {
             _eventModelFactory = eventModelFactory;
+            _userEventModelValidator = userEventModelValidator;
         }
 
         [HttpGet]
@@ -29,6 +32,7 @@ namespace SetTheDate.Controllers
                 UserId = userId,
                 EventDate = DateTime.Now.AddMonths(3),
                 EndDate = DateTime.Now.AddMonths(4),
+                ContactInformations = new List<ContactInformationModel> { new ContactInformationModel() }
             };
 
             if(eventId.HasValue && eventId > 0)
@@ -42,6 +46,17 @@ namespace SetTheDate.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UserEventModel userEvent)
         {
+            var validationResult = await _userEventModelValidator.ValidateAsync(userEvent);
+
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View("EventSetup", userEvent);
+            }
+
             var userEventModel = await _eventModelFactory.InsertUserEventAsync(userEvent);
                         
             return RedirectToAction("EventWeddingCardTemplate", new { id = userEventModel.Id });
@@ -50,6 +65,18 @@ namespace SetTheDate.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(UserEventModel userEvent)
         {
+            var validationResult = await _userEventModelValidator.ValidateAsync(userEvent);
+
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                userEvent.IsEdit = true;
+                return View("EventSetup", userEvent);
+            }
+
             var userEventModel = await _eventModelFactory.UpdateUserEventAsync(userEvent);
             return View(userEventModel);
         }
