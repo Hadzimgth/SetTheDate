@@ -150,8 +150,7 @@ namespace SetTheDate.Libraries.Services
 
                 if (validAnswers == null)
                 {
-                    var messageText = "Im sorry, I didnt quite catch that. Please answer based on the number of the previous text I had sent." )
-                    );
+                    var messageText = "Im sorry, I didnt quite catch that. Please answer based on the number of the previous text I had sent.";
 
                     await _wasenderClient.SendMessage(
                         sender,
