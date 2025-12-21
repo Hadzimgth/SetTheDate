@@ -160,9 +160,23 @@ namespace SetTheDate.ModelFactories
         }
         public async Task InsertGuestListAsync(List<EventGuestModel> eventGuestList)
         {
+            if (eventGuestList == null || !eventGuestList.Any())
+                return;
+
             var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
             await _eventService.InsertEventGuestList(entities);
 
+            // Update TotalGuest count for the event
+            var eventId = eventGuestList.First().UserEventId;
+            var validGuests = await _eventService.GetEventGuestListByIEventdAsync(eventId);
+            var totalGuestCount = validGuests.Count;
+
+            var userEvent = await _eventService.GetEventByIdAsync(eventId);
+            if (userEvent != null)
+            {
+                userEvent.TotalGuest = totalGuestCount;
+                await _eventService.UpdateEvent(userEvent);
+            }
         }
         public void UpdateGuestListAsync(List<EventGuestModel> eventGuestList)
         {

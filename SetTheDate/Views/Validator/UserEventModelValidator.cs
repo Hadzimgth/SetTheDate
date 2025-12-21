@@ -51,21 +51,20 @@ public class UserEventModelValidator : AbstractValidator<UserEventModel>
             .NotEmpty().WithMessage("Address line 3 is required.");
 
         RuleFor(x => x.Postcode)
-            .NotEmpty().WithMessage("Postcode is required.")
-            .Length(5).WithMessage("Postcode must be 5 digits.");
+            .NotEmpty().WithMessage("Postcode is required.");
 
         RuleFor(x => x.State)
             .NotEmpty().WithMessage("State is required.");
 
-        RuleFor(x => x.WeddingCardType)
-            .GreaterThan(0).WithMessage("Wedding card type is required.");
+        //RuleFor(x => x.WeddingCardType)
+        //    .GreaterThan(0).WithMessage("Wedding card type is required.");
 
-        RuleFor(x => x.EventImageAttachmentId)
-            .GreaterThan(0).WithMessage("Event image is required.");
+        //RuleFor(x => x.EventImageAttachmentId)
+        //    .GreaterThan(0).WithMessage("Event image is required.");
 
         // Contact information list validation - at least one contact person is required
-        RuleFor(x => x.ContactInformations)
-            .NotEmpty().WithMessage("At least one contact person is required.");
+        //RuleFor(x => x.ContactInformations)
+        //    .NotEmpty().WithMessage("At least one contact person is required.");
 
         RuleForEach(x => x.ContactInformations)
             .SetValidator(new ContactInformationModelValidator());

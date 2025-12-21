@@ -32,7 +32,7 @@ namespace SetTheDate.Controllers
                 UserId = userId,
                 EventDate = DateTime.Now.AddMonths(3),
                 EndDate = DateTime.Now.AddMonths(4),
-                ContactInformations = new List<ContactInformationModel> { new ContactInformationModel() }
+                Status = "Draft"
             };
 
             if(eventId.HasValue && eventId > 0)
@@ -54,6 +54,7 @@ namespace SetTheDate.Controllers
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
                 }
+                userEvent.IsEdit = false;
                 return View("EventSetup", userEvent);
             }
 

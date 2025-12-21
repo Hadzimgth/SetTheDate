@@ -48,9 +48,22 @@ namespace SetTheDate.BackgroundWorkers
 
             try
             {
+                using var scope = _scopeFactory.CreateScope();
+                var settingService = scope.ServiceProvider.GetRequiredService<SettingService>();
+
+                // Check if sendsurvey setting is enabled
+                var settings = await settingService.GetSettings();
+
+                var sendSurveyEnabled = bool.TryParse(settings.FirstOrDefault(x => x.Name == "sendsurvey")?.Value,out var result)? result : false;
+
+                if (!sendSurveyEnabled)
+                {
+                    _logger.LogInformation("SendSurveyWorker skipped - sendsurvey setting is disabled");
+                    return;
+                }
+
                 _logger.LogInformation("SendSurveyWorker execution started at {time}", DateTimeOffset.Now);
 
-                using var scope = _scopeFactory.CreateScope();
                 var whatsappService = scope.ServiceProvider.GetRequiredService<WhatsAppService>();
 
                 await whatsappService.SendPendingSurveys(stoppingToken);

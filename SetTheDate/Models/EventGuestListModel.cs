@@ -8,7 +8,7 @@
         }
 
         public int UserEventId { get; set; }
-        public IFormFile GuestFile { get; set; }
+        public IFormFile? GuestFile { get; set; }
         public List<EventGuestModel> eventGuestList { get; set; }
         public string GuestExcelTemplate { get; set; }
 

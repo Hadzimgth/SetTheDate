@@ -17,6 +17,7 @@
                     <h5 class="fw-semibold mb-3">Event Setup:</h5>
                     <input type="hidden" asp-for="UserId" />
                     <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Status" />
                     <div class="mb-3">
                         <label for="EventName" class="form-label fw-medium">Event Name</label>
                         <input type="text" class="form-control" asp-for="EventName" />
@@ -139,18 +140,21 @@
                         <tbody>
                             @for (int i = 0; i < Model.ContactInformations.Count; i++)
                             {
+                                var contact = Model.ContactInformations[i];
                                 <tr>
                                     <td>
-                                        <input asp-for="ContactInformations[@i].Name" class="form-control" />
-                                        <span asp-validation-for="ContactInformations[@i].Name" class="text-danger"></span>
+                                        <input type="hidden" name="ContactInformations[@i].Id" value="@contact.Id" />
+                                        <input type="hidden" name="ContactInformations[@i].WeddingCardInformationId" value="@contact.WeddingCardInformationId" />
+                                        <input type="text" name="ContactInformations[@i].Name" class="form-control" value="@contact.Name" data-val="true" data-val-required="Name is required." data-val-maxlength="Name cannot exceed 100 characters." data-val-maxlength-max="100" />
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[@i].Name" data-valmsg-replace="true"></span>
                                     </td>
                                     <td>
-                                        <input asp-for="ContactInformations[@i].FamilyRole" class="form-control" />
-                                        <span asp-validation-for="ContactInformations[@i].FamilyRole" class="text-danger"></span>
+                                        <input type="text" name="ContactInformations[@i].FamilyRole" class="form-control" value="@contact.FamilyRole" data-val="true" data-val-required="Family role is required." data-val-maxlength="Family role cannot exceed 50 characters." data-val-maxlength-max="50" />
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[@i].FamilyRole" data-valmsg-replace="true"></span>
                                     </td>
                                     <td>
-                                        <input asp-for="ContactInformations[@i].PhoneNumber" class="form-control" />
-                                        <span asp-validation-for="ContactInformations[@i].PhoneNumber" class="text-danger"></span>
+                                        <input type="text" name="ContactInformations[@i].PhoneNumber" class="form-control" value="@contact.PhoneNumber" data-val="true" data-val-required="Phone number is required." />
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[@i].PhoneNumber" data-valmsg-replace="true"></span>
                                     </td>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
@@ -171,7 +175,7 @@
     </div>
 
     <script>
-        let rowIndex = @Model.ContactInformations.Count;
+        let rowIndex = @(Model.ContactInformations?.Count ?? 0);
 
         document.getElementById("addRowBtn").addEventListener("click", function () {
 
@@ -180,9 +184,20 @@
             let newRow = document.createElement("tr");
 
             newRow.innerHTML = `
-                <td><input name="ContactInformations[${rowIndex}].Name" class="form-control" /></td>
-                <td><input name="ContactInformations[${rowIndex}].FamilyRole" class="form-control" /></td>
-                <td><input name="ContactInformations[${rowIndex}].PhoneNumber" class="form-control" /></td>
+                <td>
+                    <input type="hidden" name="ContactInformations[${rowIndex}].Id" value="0" />
+                    <input type="hidden" name="ContactInformations[${rowIndex}].WeddingCardInformationId" value="0" />
+                    <input name="ContactInformations[${rowIndex}].Name" class="form-control" data-val="true" data-val-required="Name is required." data-val-maxlength="Name cannot exceed 100 characters." data-val-maxlength-max="100" />
+                    <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[${rowIndex}].Name" data-valmsg-replace="true"></span>
+                </td>
+                <td>
+                    <input name="ContactInformations[${rowIndex}].FamilyRole" class="form-control" data-val="true" data-val-required="Family role is required." data-val-maxlength="Family role cannot exceed 50 characters." data-val-maxlength-max="50" />
+                    <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[${rowIndex}].FamilyRole" data-valmsg-replace="true"></span>
+                </td>
+                <td>
+                    <input name="ContactInformations[${rowIndex}].PhoneNumber" class="form-control" data-val="true" data-val-required="Phone number is required." />
+                    <span class="text-danger field-validation-valid" data-valmsg-for="ContactInformations[${rowIndex}].PhoneNumber" data-valmsg-replace="true"></span>
+                </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
                 </td>
