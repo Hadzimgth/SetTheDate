@@ -12,15 +12,17 @@ namespace SetTheDate.ModelFactories
     {
         private readonly EventService _eventService;
         private readonly PaymentService _paymentService;
+        private readonly GuestService _guestService;
         private readonly IMapper _mapper;
 
         public EventModelFactory(EventService eventService,
-            PaymentService paymentService,
+            PaymentService paymentService, GuestService guestService,
             IMapper mapper)
         {
             _eventService = eventService;
             _paymentService = paymentService;
             _mapper = mapper;
+            _guestService = guestService;
         }
 
         public async Task<UserEventModel> GetEventAndWeddingCardByIdAsync(int id)
@@ -34,6 +36,7 @@ namespace SetTheDate.ModelFactories
             model.GroomName = weddingCard.GroomName;
             model.BrideName = weddingCard.BrideName;
             model.GroomFatherName = weddingCard.GroomFatherName;
+            model.GroomMotherName = weddingCard.GroomMotherName;
             model.BrideFatherName = weddingCard.BrideFatherName;
             model.BrideMotherName = weddingCard.BrideMotherName;
             model.Wishes = weddingCard.Wishes;
@@ -50,6 +53,11 @@ namespace SetTheDate.ModelFactories
             model.EndDate = entity.EndDate;
             model.UserId = entity.UserId;
             model.Status = entity.Status;
+            model.WeddingCardType = weddingCard.WeddingCardType;
+            model.IsEdit = true;
+
+            var contactInformation = await _guestService.GetContactInformationListByWeddingCardInformationId(weddingCard.Id);
+            model.ContactInformations = _mapper.Map<List<ContactInformationModel>>(contactInformation);
 
             return model;
         }
@@ -117,8 +125,8 @@ namespace SetTheDate.ModelFactories
             weddingInfo.BrideMotherName = userEventModel.BrideMotherName;
             weddingInfo.TimeFrom = userEventModel.EventDate.Date.AddHours(11);
             weddingInfo.TimeFrom = userEventModel.EventDate.Date.AddHours(16);
-
             weddingInfo.Wishes = userEventModel.Wishes;
+
             await _eventService.InsertWeddingCardInformation(weddingInfo);
 
             var contactInfoList = new List<ContactInformation>();
@@ -133,17 +141,58 @@ namespace SetTheDate.ModelFactories
 
             return _mapper.Map<UserEventModel>(userEvent);
         }
-        public async Task<UserEventModel> UpdateUserEventAsync(UserEventModel userEventModel)
+        public async Task<UserEventModel> GetEventByIdAsync(int id)
         {
-            var entity = _mapper.Map<UserEvent>(userEventModel);
+            var userEvent = await _eventService.GetEventByIdAsync(id);
+            return _mapper.Map<UserEventModel>(userEvent);
+        }
+        public async Task<UserEventModel> UpdateUserEventAsync(UserEventModel model)
+        {
+            var entity = await _eventService.GetEventByIdAsync(model.Id);
+            entity.EventName = model.EventName;
+            entity.EventDescription = model.EventDescription;
+            entity.EventDate = model.EventDate;
+            entity.EndDate = model.EndDate;
+            entity.EndDate = model.EndDate;
+            entity.PurgeDate = model.EndDate.AddDays(30);
+            entity.UserId = model.UserId;
+            entity.Status = model.Status;
+            entity.PaymentInformationId = entity.Id;
             await _eventService.UpdateEvent(entity);
 
-            var model = _mapper.Map<UserEventModel>(entity);
+            var weddingInfo = await _eventService.GetWeddingCardByEventIdAsync(model.Id);
+            weddingInfo.UserEventId = entity.Id;
+            weddingInfo.LocationName = model.LocationName;
+            weddingInfo.BrideName = model.BrideName;
+            weddingInfo.GroomName = model.GroomName;
+            weddingInfo.Address1 = model.Address1;
+            weddingInfo.Address2 = model.Address2;
+            weddingInfo.Address3 = model.Address3;
+            weddingInfo.Postcode = model.Postcode;
+            weddingInfo.State = model.State;
+            weddingInfo.WeddingCardType = model.WeddingCardType;
+            weddingInfo.GroomFatherName = model.GroomFatherName;
+            weddingInfo.GroomMotherName = model.GroomMotherName;
+            weddingInfo.BrideFatherName = model.BrideFatherName;
+            weddingInfo.BrideMotherName = model.BrideMotherName;
+            weddingInfo.TimeFrom = model.EventDate.Date.AddHours(11);
+            weddingInfo.TimeFrom = model.EventDate.Date.AddHours(16);
+            weddingInfo.Wishes = model.Wishes;
+
+            await _eventService.UpdateWeddingCardInformation(weddingInfo);
+            //var model = _mapper.Map<UserEventModel>(entity);
             return model;
         }
+        public async Task MarkEventAsOngoingAsync(int eventId)
+        {
+            await _eventService.UpdateStatusAsync(eventId, "Ongoing");
+        }
+
         public async Task<WeddingCardInformationModel> UpdateWeddingCardAsync(WeddingCardInformationModel weddingCard)
         {
-            var entity = await _eventService.UpdateWeddingCardInformation(weddingCard);
+            var model = await _eventService.GetWeddingCardByIdAsync(weddingCard.Id);
+            model.WeddingCardType = weddingCard.WeddingCardType;
+            var entity = await _eventService.UpdateWeddingCardInformation(model);
 
             return _mapper.Map<WeddingCardInformationModel>(entity);
         }
@@ -163,11 +212,27 @@ namespace SetTheDate.ModelFactories
             if (eventGuestList == null || !eventGuestList.Any())
                 return;
 
-            var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
-            await _eventService.InsertEventGuestList(entities);
+            var eventId = eventGuestList.First().UserEventId;
+
+            // Separate new guests (Id == 0) from existing guests (Id > 0)
+            var newGuests = eventGuestList.Where(g => g.Id == 0).ToList();
+            var existingGuests = eventGuestList.Where(g => g.Id > 0).ToList();
+
+            // Insert new guests
+            if (newGuests.Any())
+            {
+                var newEntities = _mapper.Map<List<EventGuest>>(newGuests);
+                await _eventService.InsertEventGuestList(newEntities);
+            }
+
+            // Update existing guests
+            if (existingGuests.Any())
+            {
+                var existingEntities = _mapper.Map<List<EventGuest>>(existingGuests);
+                await _eventService.UpdateEventGuestList(existingEntities);
+            }
 
             // Update TotalGuest count for the event
-            var eventId = eventGuestList.First().UserEventId;
             var validGuests = await _eventService.GetEventGuestListByIEventdAsync(eventId);
             var totalGuestCount = validGuests.Count;
 

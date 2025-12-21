@@ -65,6 +65,17 @@ namespace SetTheDate.Libraries.Services
 
             return userEvent;
         }
+        public async Task UpdateStatusAsync(int id, string status)
+        {
+            var entity = await GetEventByIdAsync(id);
+
+            if (entity == null) return;
+
+            entity.Status = status;
+
+            _userEventRepository.Update(entity);
+            await _context.SaveChangesAsync();
+        }
         public async Task DeleteEvent(UserEvent userEvent)
         {
             _userEventRepository.Delete(userEvent);
@@ -86,19 +97,12 @@ namespace SetTheDate.Libraries.Services
 
             return userWeddingCard;
         }
-        public async Task<WeddingCardInformation> UpdateWeddingCardInformation(WeddingCardInformationModel userWeddingCard)
+        public async Task<WeddingCardInformation> UpdateWeddingCardInformation(WeddingCardInformation userWeddingCard)
         {
-            var entity = await _context.WeddingCardInformation
-                .FirstOrDefaultAsync(x => x.Id == userWeddingCard.Id);
+            _weddingCardInformationRepository.Update(userWeddingCard);
+            await _context.SaveChangesAsync();
 
-            if (entity != null)
-            {
-                entity.WeddingCardType = userWeddingCard.WeddingCardType;
-                // update other fields if needed
-                await _context.SaveChangesAsync();
-            }
-
-            return entity;
+            return userWeddingCard;
         }
         public async Task DeleteWeddingCardInformation(WeddingCardInformation userWeddingCard)
         {

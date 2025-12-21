@@ -74,12 +74,11 @@ namespace SetTheDate.Controllers
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
                 }
-                userEvent.IsEdit = true;
                 return View("EventSetup", userEvent);
             }
 
             var userEventModel = await _eventModelFactory.UpdateUserEventAsync(userEvent);
-            return View(userEventModel);
+            return RedirectToAction("EventWeddingCardTemplate", new { id = userEventModel.Id });
         }
 
         [HttpGet]
@@ -98,7 +97,7 @@ namespace SetTheDate.Controllers
 
             await _eventModelFactory.UpdateWeddingCardAsync(weddingCard);
 
-            return RedirectToAction("GuestQuestion", new { id = weddingCard.Id });
+            return RedirectToAction("GuestQuestion", new { id = weddingCard.UserEventId });
         }
 
         [HttpGet]
@@ -140,6 +139,13 @@ namespace SetTheDate.Controllers
         {
             var guestSetup = new EventGuestListModel();
             guestSetup.UserEventId = id;
+
+            // Load existing guests if any
+            var existingGuests = await _eventModelFactory.GetAllEventGuestListByEventIdAsync(id);
+            if (existingGuests != null && existingGuests.Any())
+            {
+                guestSetup.eventGuestList = existingGuests;
+            }
 
             return View(guestSetup);
         }
@@ -208,8 +214,21 @@ namespace SetTheDate.Controllers
         [HttpGet]
         public async Task<IActionResult> EventSetupSummary(int id)
         {
+            var userEvent = await _eventModelFactory.GetEventByIdAsync(id);
+            var questionList = await _eventModelFactory.GetAllEventQuestionListByEventIdAsync(id);
+
+            ViewBag.TotalGuest = userEvent?.TotalGuest ?? 0;
+            ViewBag.QuestionCount = questionList?.Count ?? 0;
+            ViewBag.EventId = id;
 
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MakePayment(int id)
+        {
+            await _eventModelFactory.MarkEventAsOngoingAsync(id);
+            return RedirectToAction("Dashboard", "Home");
         }
         public IActionResult DownloadGuestTemplate()
         {
