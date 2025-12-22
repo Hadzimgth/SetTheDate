@@ -23,6 +23,7 @@ namespace SetTheDate.Libraries.Services
             EventAnswerRepository eventAnswerRepository,
             WeddingCardInformationRepository weddingCardInformationRepository,
             ContactInformationRepository contactInformationRepository,
+            EventGuestAnswerRepository eventGuestAnswerRepository,
             ApplicationDbContext context)
         {
             _userEventRepository = userEventRepository;
@@ -31,6 +32,7 @@ namespace SetTheDate.Libraries.Services
             _eventAnswerRepository = eventAnswerRepository;
             _weddingCardInformationRepository = weddingCardInformationRepository;
             _contactInformationRepository = contactInformationRepository;
+            _eventGuestAnswerRepository = eventGuestAnswerRepository;
             _context = context;
         }
 

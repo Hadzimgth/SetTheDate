@@ -1,10 +1,29 @@
 ﻿@model RegisterModel
 
 @{
+    Layout = null;
     ViewData["Title"] = "Register";
 }
 
-<div class="container-fluid vh-100 vw-100 p-0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SetTheDate</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SetTheDate.styles.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <link rel="stylesheet" href="~/lib/fortawesome/fontawesome-free/css/all.css" />
+</head>
+<body>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <div class="container-fluid vh-100 vw-100 p-0">
     <div class="row g-0 h-100">
         <!-- Left section -->
         <div class="col-md-6 d-flex align-items-center justify-content-center text-dark" style="background-color: #AFCBFF;">
@@ -64,7 +83,6 @@
     </div>
 </div>
 
-@section Scripts {
     <style>
         .password-strength-container {
             width: 100%;
@@ -205,4 +223,5 @@
             });
         });
     </script>
-}
+</body>
+</html>

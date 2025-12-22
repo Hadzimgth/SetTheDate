@@ -242,5 +242,12 @@ namespace SetTheDate.Controllers
 
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> EventSummary(int id)
+        {
+            var summary = await _eventModelFactory.GetEventSummaryAsync(id);
+            return View(summary);
+        }
     }
 }

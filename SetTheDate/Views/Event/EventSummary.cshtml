@@ -1,0 +1,126 @@
+@model EventSummaryModel
+
+@{
+    ViewData["Title"] = "Event Summary";
+}
+
+<div style="background-color:#a7c8ff; min-height:100vh;">
+    <div class="container py-5">
+        <div class="bg-white p-4 rounded-4 shadow-sm">
+            <h3 class="fw-bold mb-4">Event Summary</h3>
+
+            <!-- Bar Chart Section -->
+            <div class="mb-5">
+                <canvas id="responseChart" style="max-height: 400px;"></canvas>
+            </div>
+
+            <!-- Detailed Summary Table -->
+            <div class="mt-5">
+                <h5 class="fw-semibold mb-3">Detailed Summary:</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Mobile Number</th>
+                                @if (Model.GuestResponses.Any() && Model.GuestResponses.First().QuestionAnswers.Any())
+                                {
+                                    @for (int i = 0; i < Model.GuestResponses.First().QuestionAnswers.Count; i++)
+                                    {
+                                        var questionText = Model.GuestResponses.First().QuestionAnswers[i].QuestionText;
+                                        var encodedQuestionText = questionText?.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("'", "&#39;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\n", " ").Replace("\r", " ");
+                                        <th>
+                                            Question @(i + 1)
+                                            <span class="text-info ms-1" 
+                                                  data-bs-toggle="tooltip" 
+                                                  data-bs-placement="top" 
+                                                  data-bs-title="@encodedQuestionText"
+                                                  style="cursor: pointer; font-size: 1.1em;" 
+                                                  title="">ℹ️</span>
+                                        </th>
+                                    }
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int rowNumber = 1;
+                            }
+                            @foreach (var guestResponse in Model.GuestResponses)
+                            {
+                                <tr>
+                                    <td>@rowNumber</td>
+                                    <td>@guestResponse.GuestName</td>
+                                    <td>@guestResponse.MobileNumber</td>
+                                    @foreach (var questionAnswer in guestResponse.QuestionAnswers)
+                                    {
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(questionAnswer.AnswerText))
+                                            {
+                                                @questionAnswer.AnswerText
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                                rowNumber++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('responseChart').getContext('2d');
+        const responseChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Complete', 'Incomplete', 'No Response'],
+                datasets: [{
+                    label: 'Response',
+                    data: [
+                        @Model.CompleteCount,
+                        @Model.IncompleteCount,
+                        @Model.NoResponseCount
+                    ],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 100
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                html: true,
+                placement: 'top'
+            });
+        });
+    </script>
+}
+

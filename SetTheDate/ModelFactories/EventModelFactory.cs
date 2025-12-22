@@ -328,5 +328,94 @@ namespace SetTheDate.ModelFactories
         //    _eventService.DeleteEventGuestListById(entities);
 
         //}
+
+        public async Task<EventSummaryModel> GetEventSummaryAsync(int eventId)
+        {
+            var eventModel = await GetEventByIdAsync(eventId);
+            var guests = await GetAllEventGuestListByEventIdAsync(eventId);
+            var questions = await GetAllEventQuestionListByEventIdAsync(eventId);
+            var guestAnswers = await _eventService.GetGuestAnswerListByEventIdAsync(eventId);
+            var eventAnswers = await _eventService.GetEventAnswerListByEventIdAsync(eventId);
+
+            var summary = new EventSummaryModel
+            {
+                EventId = eventId,
+                EventName = eventModel?.EventName ?? ""
+            };
+
+            int completeCount = 0;
+            int incompleteCount = 0;
+            int noResponseCount = 0;
+
+            foreach (var guest in guests)
+            {
+                var guestResponse = new GuestResponseDetailModel
+                {
+                    GuestId = guest.Id,
+                    GuestName = guest.GuestName,
+                    MobileNumber = guest.PhoneNumber
+                };
+
+                // Get all answers for this guest
+                var answersForGuest = guestAnswers.Where(ga => ga.EventGuestId == guest.Id).ToList();
+                
+                // Check if guest has any valid answers (EventAnswerId != 0)
+                var answeredQuestions = answersForGuest.Where(a => a.EventAnswerId != 0).ToList();
+                var totalQuestions = questions.Count;
+                var answeredCount = answeredQuestions.Count;
+
+                // Determine response status
+                if (answeredCount == 0)
+                {
+                    // No valid answers at all
+                    noResponseCount++;
+                    guestResponse.ResponseStatus = "No Response";
+                }
+                else if (answeredCount == totalQuestions)
+                {
+                    // All questions answered
+                    completeCount++;
+                    guestResponse.ResponseStatus = "Complete";
+                }
+                else
+                {
+                    // Some questions answered but not all
+                    incompleteCount++;
+                    guestResponse.ResponseStatus = "Incomplete";
+                }
+
+                // Build question answers for this guest
+                foreach (var question in questions.OrderBy(q => q.Id))
+                {
+                    var guestAnswer = answersForGuest.FirstOrDefault(ga => ga.EventQuestionId == question.Id);
+                    var questionAnswer = new QuestionAnswerModel
+                    {
+                        QuestionId = question.Id,
+                        QuestionText = question.Question
+                    };
+
+                    if (guestAnswer != null && guestAnswer.EventAnswerId != 0)
+                    {
+                        // Find the event answer to get the answer text
+                        var eventAnswer = eventAnswers.FirstOrDefault(ea => ea.Id == guestAnswer.EventAnswerId);
+                        if (eventAnswer != null)
+                        {
+                            questionAnswer.AnswerText = eventAnswer.Answer;
+                            questionAnswer.AnswerKeyword = eventAnswer.AnswerKeyword;
+                        }
+                    }
+
+                    guestResponse.QuestionAnswers.Add(questionAnswer);
+                }
+
+                summary.GuestResponses.Add(guestResponse);
+            }
+
+            summary.CompleteCount = completeCount;
+            summary.IncompleteCount = incompleteCount;
+            summary.NoResponseCount = noResponseCount;
+
+            return summary;
+        }
     }
 }
