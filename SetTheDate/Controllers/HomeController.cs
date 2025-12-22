@@ -91,6 +91,7 @@ namespace SetTheDate.Controllers
             HttpContext.Session.SetString("UserName", user.Email);
             HttpContext.Session.SetString("UserIsAdmin", user.IsAdmin.ToString());
 
+            TempData["SuccessMessage"] = "Registration Complete! Please login to your account to continue";
             return RedirectToAction("Login", "Home");
         }
 
