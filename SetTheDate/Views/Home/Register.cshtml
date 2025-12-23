@@ -58,9 +58,11 @@
                         <input type="email" asp-for="Email" class="form-control" placeholder="Email" />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-                    <div class="mb-3 position-relative">
-                        <input asp-for="Password" type="password" class="form-control" id="passwordInput" placeholder="Enter password" />
-                        <i class="fa-solid fa-eye position-absolute end-0 top-50 translate-middle-y me-3 text-muted" style="cursor: pointer;"></i>
+                    <div class="mb-3">
+                        <div class="position-relative">
+                            <input asp-for="Password" type="password" class="form-control" id="passwordInput" placeholder="Enter password" />
+                            <i class="fa-solid fa-eye position-absolute end-0 top-50 translate-middle-y me-3 text-muted" style="cursor: pointer;"></i>
+                        </div>
                         <div class="mt-2">
                             <div class="password-strength-container">
                                 <div class="password-strength-bar" id="passwordStrengthBar"></div>
