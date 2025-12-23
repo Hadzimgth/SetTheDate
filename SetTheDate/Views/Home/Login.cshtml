@@ -40,6 +40,9 @@
                 <!-- Right section -->
                 <div class="col-md-6 d-flex align-items-center justify-content-center bg-white">
                     <div style="width: 350px;">
+                        <div class="mb-3 text-center">
+                            <img src="~/Image/STD_Logo.png" alt="SetTheDate Logo" class="img-fluid" style="max-height: 200px;" />
+                        </div>
                         <h5 class="mb-4 fw-semibold text-center">Login</h5>
                         <form asp-action="Login" asp-controller="Home" method="post">
                             @if (ViewBag.Error != null)
