@@ -12,79 +12,187 @@
 }
 
 <style>
+    @@media (max-width: 768px) {
+        .title-handwriting {
+            font-size: 2.5rem !important;
+        }
+        .other-handwriting {
+            font-size: 1.5rem !important;
+        }
+        .border-left, .border-right {
+            width: 60px !important;
+        }
+    }
+
+    @@media (min-width: 769px) and (max-width: 1024px) {
+        .title-handwriting {
+            font-size: 4rem !important;
+        }
+        .other-handwriting {
+            font-size: 2.5rem !important;
+        }
+    }
+
+    @@media (min-width: 1025px) {
+        .title-handwriting {
+            font-size: 6.25rem !important;
+        }
+        .other-handwriting {
+            font-size: 4rem !important;
+        }
+    }
+
+    p {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 400;
+        margin-bottom: 0.5rem;
+    }
+
+    .contact-table {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 400;
+    }
+
+    .contact-table th,
+    .contact-table td {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 400;
+        color: white;
+        text-align: center;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
     .title-handwriting {
-    font-family: 'modernline', sans-serif;
-    font-size: 100px;
-    text-align: center;
-    color: white;
-    font-weight: 600;
+        font-family: 'modernline', sans-serif;
+        text-align: center;
+        color: white;
+        font-weight: 600;
+        margin: 0.5rem 0;
     }
 
     .other-handwriting {
-        font-size: 100px;
         text-align: center;
         color: white;
+        margin: 0.5rem 0;
+    }
+
+    .other-handwriting h1 {
+        margin: 0.5rem 0;
     }
 
     .card-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
     }
 
     .card-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-repeat: repeat;
-    pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-repeat: repeat;
+        pointer-events: none;
     }
 
     .border-left, .border-right {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    width: 120px;
-    background-repeat: repeat-y;
-    background-size: contain;
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 120px;
+        background-repeat: repeat-y;
+        background-size: contain;
     }
 
     .border-left {
-    left: 0;
+        left: 0;
     }
 
     .border-right {
-    right: 0;
+        right: 0;
     }
 
     .content-area {
-    position: relative;
-    z-index: 10;
-    margin-top: 120px;
-    text-align: center;
+        position: relative;
+        z-index: 10;
+        margin-top: 2rem;
+        text-align: center;
+        width: 100%;
+        max-width: 1200px;
+        padding: 2rem 1rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .content-area > div {
+        width: 100%;
+        margin: 0 auto;
+        padding: 1rem 0;
     }
 
     .center-image {
-    display: block;
-    margin: 0 auto;
-    max-width: 10%;
+        display: block;
+        margin: 0 auto;
+        width: auto;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .bismillah-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .bismillah-container img {
+        width: auto;
+        height: auto;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .bismillah-container p,
+    .bismillah-container h1 {
+        width: 100%;
+        max-width: 100%;
     }
 
     .wish-item {
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.9);
     }
 
     .wish-item h4 {
-    font-size: 26px;
+        font-size: 26px;
     }
 
     .wish-item p {
-    font-size: 18px;
-    line-height: 1.6;
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    hr {
+        width: 60%;
+        margin: 1rem auto;
+        border: none;
+        height: 1px;
+        background-color: white;
+    }
+
+    @@media (max-width: 768px) {
+        hr {
+            width: 80%;
+        }
     }
 
 </style>
@@ -97,6 +205,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SetTheDate.styles.css" asp-append-version="true" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -111,117 +220,161 @@
 
         <!-- Content (normal layout) -->
         <div class="content-area">
-            <img src="@Url.Content("~/image/bismillah.png")" class="center-image" />
-            <br />
-            <p class="other-handwriting">Celebrating</p>
-
-            <br /><br />
-
-            <h1 class="title-handwriting">@Model.GroomName</h1>
-            <h1 class="title-handwriting">&</h1>
-            <h1 class="title-handwriting">@Model.BrideName</h1>
-
-            <br /><br />
-            <p class="other-handwriting">From</p>
-            <br /><br />
-
-            <h1 class="other-handwriting">@Model.GroomFatherName</h1>
-            <h1 class="other-handwriting">&</h1>
-            <h1 class="other-handwriting">@Model.GroomMotherName</h1>
-            
-            <h1 class="other-handwriting">@Model.BrideFatherName</h1>
-            <h1 class="other-handwriting">&</h1>
-            <h1 class="other-handwriting">@Model.BrideMotherName</h1>
-
-            <br /><br />
-            <p class="other-handwriting">With all due respect</p>
-            <p class="other-handwriting">Sir/Madam</p>
-            <br /><br />
-
-            <p>On</p>
-
-            <h1 class="other-handwriting">@Model.LocationName</h1>
-
-            <h1 class="other-handwriting">@Model.TimeFrom - @Model.TimeTo</h1>
-            <br /><br />
-
-            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
-
-            <h1 class="other-handwriting">@Model.Wishes</h1>
-            
-            <br /><br />
-            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
-            <br />
-
-            <h1 class="other-handwriting">Contacts:</h1>
-
-            @foreach (var contactPerson in Model.ContactInformations)
-            {
-                <div class="row">
-                    <p>@contactPerson.Name</p>
-                    <p>@contactPerson.FamilyRole</p>
-                    <p>@contactPerson.PhoneNumber</p>
-                </div>
-            }
-
-            <br /><br />
-            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
-            <br />
-
-            <h1 class="other-handwriting">Leave your wishes here:</h1>
-
-            <div class="card shadow-sm p-4 mx-auto mb-5" style="max-width: 500px;">
-                <div class="mb-3">
-                    <input type="text" id="guestName" class="form-control" placeholder="Your name" maxlength="100" />
-                </div>
-
-                <div class="mb-3">
-                    <textarea id="guestWish" class="form-control" rows="4" placeholder="Type your wishes..." maxlength="500"></textarea>
-                </div>
-
-                <button id="btnSaveWish" class="btn btn-primary w-100"> Send Wish 💖 </button>
+            <div class="bismillah-container">
+                <img src="@Url.Content("~/Image/bismillah.png")" class="center-image" />
+                <br />
+                <p class="other-handwriting">Celebrating</p>
+                <p class="other-handwriting">The Wedding of</p>
+                <h1 class="title-handwriting">@Model.GroomName</h1>
+                <h1 class="title-handwriting">&</h1>
+                <h1 class="title-handwriting">@Model.BrideName</h1>
+                <h1 class="other-handwriting">@Model.TimeFrom.ToString("dd MMMM yyyy")</h1>
             </div>
 
             <br /><br />
-            <hr style="width: 60%; margin: 0 auto; border: none; height: 1px; background-color: white;">
-            <br />
+            <hr />
 
-            <h1 class="other-handwriting">Other Guest Wishes</h1>
-            @if (Model.GuestWishes != null && Model.GuestWishes.Any())
-            {
-                <div id="wishes-container">
-                    @for (int i = 0; i < Model.GuestWishes.Count; i++)
-                    {
-                        <div class="wish-item card shadow-sm mb-4 p-4 d-none"
-                        data-index="@i">
+            <div>
+                <p class="other-handwriting">With Joy and Gratitude to the Almighty God</p>
+            </div>
 
-                            <h4 class="fw-bold text-center mb-3">
-                                @Model.GuestWishes[i].Name
-                            </h4>
+            <div>
+                <h1 class="other-handwriting">@Model.GroomFatherName</h1>
+                <h1 class="other-handwriting">&</h1>
+                <h1 class="other-handwriting">@Model.GroomMotherName</h1>
+                <br /><br />
+                <h1 class="other-handwriting">@Model.BrideFatherName</h1>
+                <h1 class="other-handwriting">&</h1>
+                <h1 class="other-handwriting">@Model.BrideMotherName</h1>
+            </div>
 
-                            <p class="text-center fst-italic mb-0">
-                                “@Model.GuestWishes[i].Wish”
-                            </p>
-                        </div>
-                    }
+            <div>
+                <p class="other-handwriting">Cordially invite</p>
+                <p class="other-handwriting">Dato' | Datin | Mr. | Mrs. | Ms</p>
+                <p class="other-handwriting">to the wedding reception of our son and daughter</p>
+            </div>
+
+            <div>
+                <h1 class="other-handwriting">@Model.LocationName</h1>
+                <h1 class="other-handwriting">@Model.TimeFrom.ToString("HH:mm") - @Model.TimeTo.ToString("HH:mm")</h1>
+            </div>
+
+            <div>
+                <h1 class="other-handwriting">Contacts:</h1>
+
+                @if (Model.ContactInformations != null && Model.ContactInformations.Any())
+                {
+                    <div class="table-responsive d-flex justify-content-center">
+                        <table class="table table-bordered contact-table" style="max-width: 600px; width: 100%; margin: 1rem auto;">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Family Role</th>
+                                    <th>Phone Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var contactPerson in Model.ContactInformations)
+                                {
+                                    <tr>
+                                        <td>@contactPerson.Name</td>
+                                        <td>@contactPerson.FamilyRole</td>
+                                        <td>@contactPerson.PhoneNumber</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <br /><br />
+            </div>
+
+            <div>
+                <input type="hidden" id="weddingCardId" value="@Model.Id" />
+                <div class="card shadow-sm p-4 mx-auto mb-5" style="max-width: 500px; width: 100%;">
+                    <div class="mb-3">
+                        <input type="text" id="guestName" class="form-control" placeholder="Your name" maxlength="100" />
+                    </div>
+
+                    <div class="mb-3">
+                        <textarea id="guestWish" class="form-control" rows="4" placeholder="Type your wishes..." maxlength="500"></textarea>
+                    </div>
+
+                    <button id="btnSaveWish" class="btn btn-primary w-100"> Send Wish 💖 </button>
                 </div>
-                <nav class="mt-4">
-                    <ul class="pagination justify-content-center" id="wishes-pagination"></ul>
-                </nav>
-            }
-            else
-            {
-                <p class="text-center fst-italic text-light">
-                    Be the first to leave a wish 💖
-                </p>                
-            }
-            
-            <br /><br />
-            <br /><br />
+
+                <br /><br />
+                <hr />
+                <br />
+
+                <h1 class="other-handwriting">Other Guest Wishes</h1>
+                @if (Model.GuestWishes != null && Model.GuestWishes.Any())
+                {
+                    <div id="wishes-container" class="container-fluid">
+                        <div class="row justify-content-center">
+                            @for (int i = 0; i < Model.GuestWishes.Count; i++)
+                            {
+                                <div class="col-12 col-md-10 col-lg-8 mb-3">
+                                    <div class="wish-item card shadow-sm p-4 d-none" data-index="@i">
+                                        <h4 class="fw-bold text-center mb-3">
+                                            @Model.GuestWishes[i].Name
+                                        </h4>
+
+                                        <p class="text-center fst-italic mb-0">
+                                            "@Model.GuestWishes[i].Wish"
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center" id="wishes-pagination"></ul>
+                    </nav>
+                }
+                else
+                {
+                    <p class="text-center fst-italic text-light">
+                        Be the first to leave a wish 💖
+                    </p>
+                }
+            </div>
         </div>
     </div>
     <script>
         $(document).ready(function () {
+            // Make bismillah image width match the text below it
+            function matchImageToText() {
+                const container = $('.bismillah-container');
+                const img = container.find('img');
+                const textElements = container.find('p, h1');
+                
+                if (textElements.length > 0) {
+                    // Get the maximum width of text elements
+                    let maxTextWidth = 0;
+                    textElements.each(function() {
+                        const width = $(this).outerWidth();
+                        if (width > maxTextWidth) {
+                            maxTextWidth = width;
+                        }
+                    });
+                    
+                    // Set image width to match (with some padding consideration)
+                    if (maxTextWidth > 0) {
+                        img.css('width', maxTextWidth + 'px');
+                        img.css('max-width', '100%');
+                    }
+                }
+            }
+
+            // Call on load and resize
+            matchImageToText();
+            $(window).on('resize', function() {
+                setTimeout(matchImageToText, 100);
+            });
+
+            // Pagination for wishes
             const pageSize = 10;
             const items = $('.wish-item');
             const totalItems = items.length;
@@ -254,12 +407,88 @@
                 $('.pagination li').first().addClass('active');
             }
 
-            buildPagination();
-            showPage(1);
+            if (totalItems > 0) {
+                buildPagination();
+                showPage(1);
 
-            $(document).on('click', '.pagination li', function () {
-                const page = $(this).data('page');
-                showPage(page);
+                $(document).on('click', '.pagination li', function () {
+                    const page = $(this).data('page');
+                    showPage(page);
+                });
+            }
+
+            // Handle Save Wish button click
+            $('#btnSaveWish').on('click', function() {
+                const name = $('#guestName').val().trim();
+                const wish = $('#guestWish').val().trim();
+                const weddingCardId = $('#weddingCardId').val();
+
+                if (!name || !wish) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Validation Error',
+                        text: 'Please enter both your name and wish.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#307CFF'
+                    });
+                    return;
+                }
+
+                // Disable button during save
+                const btn = $(this);
+                btn.prop('disabled', true);
+                btn.text('Saving...');
+
+                // Send AJAX request to save wish
+                $.ajax({
+                    url: '/Home/SaveGuestWish',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        Name: name,
+                        Wish: wish,
+                        WeddingCardInformationId: parseInt(weddingCardId)
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message || 'Your wish has been saved.',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#307CFF'
+                            }).then(() => {
+                                // Clear form
+                                $('#guestName').val('');
+                                $('#guestWish').val('');
+                                
+                                // Reload page to show new wish
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to save wish. Please try again.',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#307CFF'
+                            });
+                            btn.prop('disabled', false);
+                            btn.text(' Send Wish 💖 ');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while saving your wish. Please try again.',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#307CFF'
+                        });
+                        btn.prop('disabled', false);
+                        btn.text(' Send Wish 💖 ');
+                    }
+                });
             });
         });
     </script>
