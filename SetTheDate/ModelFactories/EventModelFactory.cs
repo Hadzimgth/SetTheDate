@@ -66,6 +66,12 @@ namespace SetTheDate.ModelFactories
             var weddingCard = await _eventService.GetWeddingCardByIdAsync(id);
             var model = _mapper.Map<WeddingCardInformationModel>(weddingCard);
 
+            var contactInformation = await _guestService.GetContactInformationListByWeddingCardInformationId(weddingCard.Id);
+            model.ContactInformations = _mapper.Map<List<ContactInformationModel>>(contactInformation);
+
+            var guestWishes = await _guestService.GetGuestWishesListByWeddingCardInformationId(weddingCard.Id);
+            model.GuestWishes = _mapper.Map<List<GuestWishesModel>>(guestWishes);
+
             return model;
         }
         public async Task<DashboardModel> GetAllEventByUserIdAsync(int userId)
@@ -124,7 +130,7 @@ namespace SetTheDate.ModelFactories
             weddingInfo.BrideFatherName = userEventModel.BrideFatherName;
             weddingInfo.BrideMotherName = userEventModel.BrideMotherName;
             weddingInfo.TimeFrom = userEventModel.EventDate.Date.AddHours(11);
-            weddingInfo.TimeFrom = userEventModel.EventDate.Date.AddHours(16);
+            weddingInfo.TimeTo = userEventModel.EventDate.Date.AddHours(16);
             weddingInfo.Wishes = userEventModel.Wishes;
 
             await _eventService.InsertWeddingCardInformation(weddingInfo);

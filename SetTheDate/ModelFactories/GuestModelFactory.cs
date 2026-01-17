@@ -33,10 +33,10 @@ namespace SetTheDate.ModelFactories
             return weddingCard;
         }
 
-        public void InsertGuestWishes(GuestWishesModel guestWishesModel)
+        public async Task InsertGuestWishes(GuestWishesModel guestWishesModel)
         {
             var entity = _mapper.Map<GuestWishes>(guestWishesModel);
-            _guestService.InsertWishes(entity);
+            await _guestService.InsertWishes(entity);
         }
     }
 }
