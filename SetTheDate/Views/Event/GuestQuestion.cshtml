@@ -5,10 +5,11 @@
 }
 
 
-<form asp-action="@(Model.IsEdit ? "GuesQuestionEdit" : "GuesQuestionCreate")" asp-controller="Event" method="post">
+<form asp-action="@(Model.IsEdit ? "GuestQuestionEdit" : "GuestQuestionCreate")" asp-controller="Event" method="post">
     <div style="background-color:#a7c8ff; min-height:100vh;">
         <div class="container py-4">
             <div class="bg-white p-4 rounded-4 shadow-sm">
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
                 <h3 class="fw-bold mb-4">What do you need from your guest:</h3>
 
                 <div class="mb-4">
@@ -25,37 +26,57 @@
                 </div>
 
                 <div id="question-container">
-                    @for (var q = 0; q < Model.EventQuestionListModel.Count; q++)
+                    @if (Model.EventQuestionListModel != null)
                     {
-                        <div class="bg-light p-3 rounded-3 mb-3 question-block" data-index="@q">
-                            <div class="fw-bold mb-2">
-                                Question <span class="question-number"></span>
+                        @for (var q = 0; q < Model.EventQuestionListModel.Count; q++)
+                        {
+                            var question = Model.EventQuestionListModel[q];
+                            if (question == null) continue;
+                            
+                            <div class="bg-light p-3 rounded-3 mb-3 question-block" data-index="@q">
+                                <div class="fw-bold mb-2 d-flex justify-content-between align-items-center">
+                                    <span>Question <span class="question-number"></span></span>
+                                    <button type="button" class="btn btn-sm btn-danger delete-question-btn">
+                                        <i class="fa-solid fa-trash"></i> Delete Question
+                                    </button>
+                                </div>
+                                <div class="input-group mb-2">
+                                    <input class="form-control" name="EventQuestionListModel[@q].Question" value="@(question.Question ?? "")" />
+                                </div>
+
+                                <div class="answers-container">
+                                    @if (question.EventAnswerListModel != null)
+                                    {
+                                        @for (var a = 0; a < question.EventAnswerListModel.Count; a++)
+                                        {
+                                            var answer = question.EventAnswerListModel[a];
+                                            if (answer == null) continue;
+                                            
+                                            <div class="mb-2">
+                                                <label class="form-label">
+                                                    Answer <span class="answer-number"></span>
+                                                </label>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input class="form-control answer-block"
+                                                           name="EventQuestionListModel[@q].EventAnswerListModel[@a].Answer"
+                                                           value="@(answer.Answer ?? "")" />
+                                                    <button type="button" class="btn btn-sm btn-danger delete-answer-btn">
+                                                        <i class="fa-solid fa-trash">Delete</i>
+                                                    </button>
+                                                    <input type="hidden"
+                                                           name="EventQuestionListModel[@q].EventAnswerListModel[@a].AnswerKeyword"
+                                                           value="@(a + 1)" />
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+
+                                <button type="button" class="btn btn-sm btn-primary add-answer-btn">
+                                    Add Answer
+                                </button>
                             </div>
-                            <input class="form-control mb-2" name="EventQuestionListModel[@q].Question" value="@Model.EventQuestionListModel[q].Question" />
-
-                            <div class="answers-container">
-                                @for (var a = 0; a < Model.EventQuestionListModel[q].EventAnswerListModel.Count; a++)
-                                {
-                                    <label class="form-label">
-                                        Answer <span class="answer-number"></span>
-                                    </label>
-
-                                    <div class="form-check mb-1 answer-block">
-                                        <input class="form-control"
-                                               name="EventQuestionListModel[@q].EventAnswerListModel[@a].Answer"
-                                               value="@Model.EventQuestionListModel[q].EventAnswerListModel[a].Answer" />
-
-                                        <input type="hidden"
-                                               name="EventQuestionListModel[@q].EventAnswerListModel[@a].AnswerKeyword"
-                                               value="@(a + 1)" />
-                                    </div>
-                                }
-                            </div>
-
-                            <button type="button" class="btn btn-sm btn-primary add-answer-btn">
-                                Add Answer
-                            </button>
-                        </div>
+                        }
                     }
                 </div>
 
@@ -65,10 +86,15 @@
 
                 <div id="question-template" class="d-none">
                     <div class="bg-light p-3 rounded-3 mb-3 question-block">
-                        <div class="fw-bold mb-2">
-                            Question <span class="question-number"></span>
+                        <div class="fw-bold mb-2 d-flex justify-content-between align-items-center">
+                            <span>Question <span class="question-number"></span></span>
+                            <button type="button" class="btn btn-sm btn-danger delete-question-btn">
+                                <i class="fa-solid fa-trash"></i> Delete Question
+                            </button>
                         </div>
-                        <input class="form-control mb-2 question-input" name="__name__.Question" />
+                        <div class="input-group mb-2">
+                            <input class="form-control question-input" name="__name__.Question" />
+                        </div>
 
                         <div class="answers-container"></div>
 
@@ -79,12 +105,17 @@
                 </div>
 
                 <div id="answer-template" class="d-none">
-                    <div class="form-check mb-1 answer-block">
+                    <div class="mb-2">
                         <label class="form-label">
                             Answer <span class="answer-number"></span>
                         </label>
-
-                        <input class="form-control answer-input" name="__ansname__.Answer" />
+                        <div class="d-flex align-items-center gap-2">
+                            <input class="form-control answer-input answer-block" name="__ansname__.Answer" />
+                            <button type="button" class="btn btn-sm btn-danger delete-answer-btn">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <input type="hidden" name="__ansname__.AnswerKeyword" value="__ansindex__" />
+                        </div>
                     </div>
                 </div>
 
@@ -127,13 +158,13 @@
 
                     let answersContainer = questionBlock.querySelector(".answers-container");
 
-                    let aIndex = answersContainer.querySelectorAll(".answer-block").length;
+                    let aIndex = answersContainer.querySelectorAll(".mb-2").length;
 
                     let template = document.getElementById("answer-template").innerHTML;
 
                     let html = template.replace(/__ansname__/g,
                         `EventQuestionListModel[${qIndex}].EventAnswerListModel[${aIndex}]`
-                    );
+                    ).replace(/__ansindex__/g, (aIndex + 1).toString());
 
                     let block = document.createElement("div");
                     block.innerHTML = html.trim();
@@ -142,15 +173,75 @@
 
                     refreshAnswerNumbers();
                 }
+                
+                // Handle delete question button
+                if (e.target.closest(".delete-question-btn")) {
+                    const questionBlock = e.target.closest(".question-block");
+                    const questionCount = document.querySelectorAll('.question-block').length;
+                    
+                    if (questionCount <= 1) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Cannot Delete',
+                            text: 'At least one question is required.',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#307CFF'
+                        });
+                        return;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Delete Question?',
+                        text: 'Are you sure you want to delete this question and all its answers?',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, delete it',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            questionBlock.remove();
+                            ensureProperIndexing();
+                        }
+                    });
+                }
+                
+                // Handle delete answer button
+                if (e.target.closest(".delete-answer-btn")) {
+                    const answerGroup = e.target.closest(".mb-2");
+                    const questionBlock = answerGroup.closest(".question-block");
+                    const answersContainer = questionBlock.querySelector(".answers-container");
+                    const answerCount = answersContainer.querySelectorAll('.mb-2').length;
+                                        
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Delete Answer?',
+                        text: 'Are you sure you want to delete this answer?',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, delete it',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            answerGroup.remove();
+                            const qIndex = questionBlock.dataset.index;
+                            reindexAnswersForBlock(questionBlock, qIndex);
+                            refreshAnswerNumbers();
+                        }
+                    });
+                }
             });
 
             function refreshAnswerNumbers() {
                 const questionBlocks = document.querySelectorAll('.question-block');
 
                 questionBlocks.forEach(block => {
-                    const answerBlocks = block.querySelectorAll('.answer-block');
-                    answerBlocks.forEach((ans, index) => {
-                        const numSpan = ans.querySelector('.answer-number');
+                    const answersContainer = block.querySelector('.answers-container');
+                    const answerGroups = answersContainer.querySelectorAll('.mb-2');
+                    answerGroups.forEach((group, index) => {
+                        const numSpan = group.querySelector('.answer-number');
                         if (numSpan) numSpan.textContent = index + 1;
                     });
                 });
@@ -161,6 +252,133 @@
                 questionBlocks.forEach((block, index) => {
                     const numSpan = block.querySelector('.question-number');
                     if (numSpan) numSpan.textContent = index + 1;
+                });
+            }
+
+            // Reindex all questions after deletion
+            function reindexQuestions() {
+                const questionBlocks = Array.from(document.querySelectorAll('.question-block'));
+                
+                questionBlocks.forEach((block, qIndex) => {
+                    // Update data-index
+                    block.setAttribute('data-index', qIndex);
+                    
+                    // Update question input name - find input directly in this block
+                    const questionInput = block.querySelector('input[name*=".Question"]');
+                    if (questionInput) {
+                        questionInput.name = `EventQuestionListModel[${qIndex}].Question`;
+                    }
+                    
+                    // Reindex all answers in this question - pass the block directly
+                    reindexAnswersForBlock(block, qIndex);
+                });
+                
+                // Update questionIndex for adding new questions
+                questionIndex = questionBlocks.length;
+            }
+
+            // Reindex answers within a specific question block
+            function reindexAnswersForBlock(questionBlock, qIndex) {
+                if (!questionBlock) return;
+                
+                const answersContainer = questionBlock.querySelector('.answers-container');
+                if (!answersContainer) return;
+                
+                const answerGroups = Array.from(answersContainer.querySelectorAll('.mb-2'));
+                answerGroups.forEach((answerGroup, aIndex) => {
+                    // Update answer input name - find the text input (not the hidden keyword input)
+                    const answerInput = answerGroup.querySelector('input[name*=".Answer"]:not([type="hidden"])');
+                    if (answerInput) {
+                        answerInput.name = `EventQuestionListModel[${qIndex}].EventAnswerListModel[${aIndex}].Answer`;
+                    }
+                    
+                    // Update answer keyword hidden input
+                    const keywordInput = answerGroup.querySelector('input[name*=".AnswerKeyword"]');
+                    if (keywordInput) {
+                        keywordInput.name = `EventQuestionListModel[${qIndex}].EventAnswerListModel[${aIndex}].AnswerKeyword`;
+                        keywordInput.value = (aIndex + 1).toString();
+                    }
+                });
+            }
+
+            // Legacy function for backward compatibility
+            function reindexAnswers(qIndex) {
+                const questionBlock = document.querySelector(`.question-block[data-index="${qIndex}"]`);
+                if (questionBlock) {
+                    reindexAnswersForBlock(questionBlock, qIndex);
+                }
+            }
+
+            // Validation function to check if all questions have at least 2 answers
+            function validateQuestions() {
+                const questionBlocks = document.querySelectorAll('.question-block');
+                let isValid = true;
+                let errorMessages = [];
+
+                questionBlocks.forEach((block, qIndex) => {
+                    const questionInput = block.querySelector('input[name*=".Question"]');
+                    const questionText = questionInput ? questionInput.value.trim() : '';
+                    const answersContainer = block.querySelector('.answers-container');
+                    const answerInputs = answersContainer ? answersContainer.querySelectorAll('input[name*=".Answer"]:not([type="hidden"])') : [];
+                    
+                    // Count non-empty answers
+                    const nonEmptyAnswers = Array.from(answerInputs).filter(input => {
+                        return input.value && input.value.trim() !== '';
+                    });
+
+                    // Remove error styling first
+                    block.classList.remove('border', 'border-danger');
+
+                    // Check: if question has no text, it shouldn't have answers
+                    if (!questionText && nonEmptyAnswers.length > 0) {
+                        isValid = false;
+                        block.classList.add('border', 'border-danger');
+                        const questionNum = qIndex + 1;
+                        errorMessages.push(`Question ${questionNum}: A question with answers must have question text.`);
+                    }
+                    // Check: if question has text, it must have at least 2 answers
+                    else if (questionText && nonEmptyAnswers.length < 2) {
+                        isValid = false;
+                        block.classList.add('border', 'border-danger');
+                        const questionNum = qIndex + 1;
+                        errorMessages.push(`Question ${questionNum} must have at least 2 answers.`);
+                    }
+                });
+
+                if (!isValid) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: errorMessages.join('<br/>'),
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#307CFF'
+                    });
+                }
+
+                return isValid;
+            }
+
+            // Reindex everything before form submission to ensure proper model binding
+            function ensureProperIndexing() {
+                reindexQuestions();
+                refreshQuestionNumbers();
+                refreshAnswerNumbers();
+            }
+
+
+            // Validate before form submission
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    // Always reindex before submission to ensure proper model binding
+                    ensureProperIndexing();
+                    
+                    // Validate immediately after reindexing
+                    if (!validateQuestions()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
                 });
             }
 

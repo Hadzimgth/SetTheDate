@@ -85,7 +85,7 @@ builder.Services.AddScoped<AttachmentModelFactory>();
 //validator
 builder.Services.AddValidatorsFromAssemblyContaining<ContactInformationModelValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<EventAnswerModelValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<EventQuestionModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<EventSurveySetupValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<GuestWishesModelValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterModelValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserEventModelValidator>();

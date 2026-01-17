@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SetTheDate.Libraries.Dtos;
 using SetTheDate.Libraries.Repositories;
 using SetTheDate.Models;
@@ -10,12 +11,14 @@ namespace SetTheDate.Libraries.Services
         public readonly EventService _eventService;
         public readonly GuestService _guestService;
         public readonly WasenderClient _wasenderClient;
+        private readonly IConfiguration _configuration;
 
-        public WhatsAppService(EventService eventService, GuestService guestService, WasenderClient wasenderClient)
+        public WhatsAppService(EventService eventService, GuestService guestService, WasenderClient wasenderClient, IConfiguration configuration)
         {
             _eventService = eventService;
             _guestService = guestService;
             _wasenderClient = wasenderClient;
+            _configuration = configuration;
         }
 
         public async Task SendPendingSurveys(CancellationToken token)
@@ -71,13 +74,40 @@ namespace SetTheDate.Libraries.Services
                             continue;
                     }
                     else
-                        continue;
+                        nextSequence = int.MaxValue; // No more surveys - will result in eventSurvey == null
 
                     var eventSurvey = eventSurveyList
                         .FirstOrDefault(x => x.Sequence == nextSequence);
 
                     if (eventSurvey == null)
+                    {
+                        // No more surveys to send - check if all surveys are completed and send thank you
+                        if (guestSentData.Count > 0 && guestSentData.Count == eventSurveyList.Count)
+                        {
+                            var allAnswersCompleted = guestSentData.All(x => x.EventAnswerId != 0 && x.EventAnswerId != 2);
+                            
+                            if (allAnswersCompleted)
+                            {
+                                // Get wedding card for this event
+                                var weddingCard = await _eventService.GetWeddingCardByEventIdAsync(eventId);
+                                
+                                if (weddingCard != null)
+                                {
+                                    // Get base URL from configuration or use a default
+                                    var baseUrl = _configuration["AppSettings:BaseUrl"] ?? _configuration["AppSettings:BaseURL"] ?? "http://localhost:5123";
+                                    var weddingCardLink = $"{baseUrl.TrimEnd('/')}/home/weddingcard?weddingCardId={weddingCard.Id}";
+                                    
+                                    var thankYouMessage = "Thank you for participating in answering the questions. We greatly appreciate in your participation. In the meantime please visit the eWeddingCard for more information and or leave a wedding wish to them!\n\nVisit it here\n" + weddingCardLink;
+                                    
+                                    await _wasenderClient.SendMessage(
+                                        guest.PhoneNumber,
+                                        thankYouMessage
+                                    );
+                                }
+                            }
+                        }
                         continue;
+                    }
 
                     var eventGuestAnswer = new EventGuestAnswer
                     {

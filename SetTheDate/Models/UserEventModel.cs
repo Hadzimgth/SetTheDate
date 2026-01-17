@@ -28,8 +28,8 @@
         public string Wishes { get; set; }
         public string LocationName { get; set; }
         public string Address1 { get; set; }
-        public string Address2 { get; set; }
-        public string Address3 { get; set; }
+        public string? Address2 { get; set; }
+        public string? Address3 { get; set; }
         public string Postcode { get; set; }
         public string State { get; set; }
         public int WeddingCardType { get; set; }

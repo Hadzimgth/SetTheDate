@@ -180,7 +180,7 @@ namespace SetTheDate.ModelFactories
             weddingInfo.Wishes = model.Wishes;
 
             await _eventService.UpdateWeddingCardInformation(weddingInfo);
-            //var model = _mapper.Map<UserEventModel>(entity);
+
             return model;
         }
         public async Task MarkEventAsOngoingAsync(int eventId)
@@ -214,25 +214,22 @@ namespace SetTheDate.ModelFactories
 
             var eventId = eventGuestList.First().UserEventId;
 
-            // Separate new guests (Id == 0) from existing guests (Id > 0)
+
             var newGuests = eventGuestList.Where(g => g.Id == 0).ToList();
             var existingGuests = eventGuestList.Where(g => g.Id > 0).ToList();
 
-            // Insert new guests
             if (newGuests.Any())
             {
                 var newEntities = _mapper.Map<List<EventGuest>>(newGuests);
                 await _eventService.InsertEventGuestList(newEntities);
             }
 
-            // Update existing guests
             if (existingGuests.Any())
             {
                 var existingEntities = _mapper.Map<List<EventGuest>>(existingGuests);
                 await _eventService.UpdateEventGuestList(existingEntities);
             }
 
-            // Update TotalGuest count for the event
             var validGuests = await _eventService.GetEventGuestListByIEventdAsync(eventId);
             var totalGuestCount = validGuests.Count;
 
@@ -276,9 +273,6 @@ namespace SetTheDate.ModelFactories
             }
         }
 
-
-
-
         public async Task<List<EventQuestionModel>> GetAllEventQuestionListByEventIdAsync(int eventId)
         {
             var eventList = await _eventService.GetEventQuestionListByIdAsync(eventId);
@@ -295,14 +289,32 @@ namespace SetTheDate.ModelFactories
 
             return modelList;
         }
-        public async Task InsertEventQuestionListAsync(EventSurveySetup surverySetup)
+        public async Task InsertEventQuestionListAsync(EventSurveySetup surveySetup)
         {
-            //var entities = _mapper.Map<List<EventQuestion>>(eventQuestionModels);
+
+            var existingGuestAnswers = await _eventService.GetGuestAnswerListByEventIdAsync(surveySetup.UserEventId);
+            foreach (var guestAnswer in existingGuestAnswers)
+            {
+                await _eventService.DeleteGeestAnswer(guestAnswer);
+            }
+
+            var existingAnswers = await _eventService.GetEventAnswerListByEventIdAsync(surveySetup.UserEventId);
+            foreach (var answer in existingAnswers)
+            {
+                await _eventService.DeleteEventAnswer(answer);
+            }
+
+            var existingQuestions = await _eventService.GetEventQuestionListByIdAsync(surveySetup.UserEventId);
+            foreach (var question in existingQuestions)
+            {
+                await _eventService.DeleteEventQuestionList(new List<EventQuestion> { question });
+            }
+
             int sequence = 0;
-            foreach (var question in surverySetup.EventQuestionListModel)
+            foreach (var question in surveySetup.EventQuestionListModel)
             {
                 var entity = _mapper.Map<EventQuestion>(question);
-                entity.UserEventId = surverySetup.UserEventId;
+                entity.UserEventId = surveySetup.UserEventId;
                 entity.Sequence = sequence++;
                 await _eventService.InsertEventQuestion(entity);
 
@@ -310,24 +322,12 @@ namespace SetTheDate.ModelFactories
                 {
                     var answerEntity = _mapper.Map<EventAnswer>(answerModel);
                     answerEntity.EventQuestionId = entity.Id;
-                    answerEntity.EventId = surverySetup.UserEventId;
+                    answerEntity.EventId = surveySetup.UserEventId;
                     await _eventService.InsertEventAnswer(answerEntity);
                 }
             }
 
         }
-        //public void UpdateGuestListAsync(List<EventGuestModel> eventGuestList)
-        //{
-        //    var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
-        //    _eventService.UpdateEventGuestListById(entities);
-
-        //}
-        //public void DeleteGuestListAsync(List<EventGuestModel> eventGuestList)
-        //{
-        //    var entities = _mapper.Map<List<EventGuest>>(eventGuestList);
-        //    _eventService.DeleteEventGuestListById(entities);
-
-        //}
 
         public async Task<EventSummaryModel> GetEventSummaryAsync(int eventId)
         {
@@ -356,35 +356,33 @@ namespace SetTheDate.ModelFactories
                     MobileNumber = guest.PhoneNumber
                 };
 
-                // Get all answers for this guest
+
                 var answersForGuest = guestAnswers.Where(ga => ga.EventGuestId == guest.Id).ToList();
                 
-                // Check if guest has any valid answers (EventAnswerId != 0)
                 var answeredQuestions = answersForGuest.Where(a => a.EventAnswerId != 0).ToList();
                 var totalQuestions = questions.Count;
                 var answeredCount = answeredQuestions.Count;
 
-                // Determine response status
+
                 if (answeredCount == 0)
                 {
-                    // No valid answers at all
+
                     noResponseCount++;
                     guestResponse.ResponseStatus = "No Response";
                 }
                 else if (answeredCount == totalQuestions)
                 {
-                    // All questions answered
+
                     completeCount++;
                     guestResponse.ResponseStatus = "Complete";
                 }
                 else
                 {
-                    // Some questions answered but not all
                     incompleteCount++;
                     guestResponse.ResponseStatus = "Incomplete";
                 }
 
-                // Build question answers for this guest
+
                 foreach (var question in questions.OrderBy(q => q.Id))
                 {
                     var guestAnswer = answersForGuest.FirstOrDefault(ga => ga.EventQuestionId == question.Id);
@@ -396,7 +394,6 @@ namespace SetTheDate.ModelFactories
 
                     if (guestAnswer != null && guestAnswer.EventAnswerId != 0)
                     {
-                        // Find the event answer to get the answer text
                         var eventAnswer = eventAnswers.FirstOrDefault(ea => ea.Id == guestAnswer.EventAnswerId);
                         if (eventAnswer != null)
                         {
