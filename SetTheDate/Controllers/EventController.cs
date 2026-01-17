@@ -15,11 +15,13 @@ namespace SetTheDate.Controllers
     {
         private readonly EventModelFactory _eventModelFactory;
         private readonly IValidator<UserEventModel> _userEventModelValidator;
+        private readonly IValidator<EventSurveySetup> _eventSurveySetupValidator;
 
-        public EventController(EventModelFactory eventModelFactory, IValidator<UserEventModel> userEventModelValidator)
+        public EventController(EventModelFactory eventModelFactory, IValidator<UserEventModel> userEventModelValidator, IValidator<EventSurveySetup> eventSurveySetupValidator)
         {
             _eventModelFactory = eventModelFactory;
             _userEventModelValidator = userEventModelValidator;
+            _eventSurveySetupValidator = eventSurveySetupValidator;
         }
 
         [HttpGet]
@@ -108,30 +110,149 @@ namespace SetTheDate.Controllers
             var eventSurvey = new EventSurveySetup();
             eventSurvey.UserEventId = id;
 
+            var existingQuestions = await _eventModelFactory.GetAllEventQuestionListByEventIdAsync(id);
 
-            var answerList = new List<EventAnswerModel>();
-            var answer = new EventAnswerModel();
-            answer.Answer = "1. Yes";
-            answerList.Add(answer);
-            answer = new EventAnswerModel();
-            answer.Answer = "2. No";
-            answerList.Add(answer);
+            if (existingQuestions != null && existingQuestions.Any())
+            {
+                eventSurvey.EventQuestionListModel = existingQuestions;
+                eventSurvey.IsEdit = true;
+            }
+            else
+            {
+                var answerList = new List<EventAnswerModel>();
+                var answer = new EventAnswerModel();
+                answer.Answer = "1. Yes";
+                answerList.Add(answer);
+                answer = new EventAnswerModel();
+                answer.Answer = "2. No";
+                answerList.Add(answer);
 
-            var eventQuestionModel = new EventQuestionModel();
-            eventQuestionModel.Question = $"you are invited to {eventModel.BrideName} & {eventModel.GroomName} on {eventModel.EventDate}. Would you be able to participate? \nPlease answer based on the numbers only.";
-            eventQuestionModel.EventAnswerListModel = answerList;
+                var eventQuestionModel = new EventQuestionModel();
+                eventQuestionModel.Question = $"you are invited to {eventModel.BrideName} & {eventModel.GroomName} on {eventModel.EventDate}. Would you be able to participate? \nPlease answer based on the numbers only.";
+                eventQuestionModel.EventAnswerListModel = answerList;
 
-            eventSurvey.EventQuestionListModel.Add(eventQuestionModel);
+                eventSurvey.EventQuestionListModel.Add(eventQuestionModel);
+                eventSurvey.IsEdit = false;
+            }
 
             return View(eventSurvey);
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuesQuestionCreate(EventSurveySetup surverySetup)
+        public async Task<IActionResult> GuestQuestionCreate(EventSurveySetup surveySetup)
         {
-            await _eventModelFactory.InsertEventQuestionListAsync(surverySetup);
 
-            return RedirectToAction("GuestSetup", new { id = surverySetup.UserEventId });
+            if (surveySetup == null)
+            {
+                surveySetup = new EventSurveySetup();
+            }
+            if (surveySetup.EventQuestionListModel == null)
+            {
+                surveySetup.EventQuestionListModel = new List<EventQuestionModel>();
+            }
+            
+
+            surveySetup.EventQuestionListModel = surveySetup.EventQuestionListModel
+                .Where(q => q != null)
+                .ToList();
+                
+            foreach (var question in surveySetup.EventQuestionListModel)
+            {
+                if (question.EventAnswerListModel == null)
+                {
+                    question.EventAnswerListModel = new List<EventAnswerModel>();
+                }
+
+                question.EventAnswerListModel = question.EventAnswerListModel
+                    .Where(a => a != null)
+                    .ToList();
+            }
+            
+            surveySetup.EventQuestionListModel = surveySetup.EventQuestionListModel
+                .Where(q => !string.IsNullOrWhiteSpace(q.Question) || (q.EventAnswerListModel != null && q.EventAnswerListModel.Any(a => !string.IsNullOrWhiteSpace(a.Answer))))
+                .ToList();
+            
+            foreach (var question in surveySetup.EventQuestionListModel)
+            {
+                question.EventAnswerListModel = question.EventAnswerListModel
+                    .Where(a => !string.IsNullOrWhiteSpace(a.Answer))
+                    .ToList();
+            }
+
+            var validationResult = await _eventSurveySetupValidator.ValidateAsync(surveySetup);
+
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                
+                surveySetup.IsEdit = false;
+                return View("GuestQuestion", surveySetup);
+            }
+
+            await _eventModelFactory.InsertEventQuestionListAsync(surveySetup);
+
+            return RedirectToAction("GuestSetup", new { id = surveySetup.UserEventId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GuestQuestionEdit(EventSurveySetup surveySetup)
+        {
+            if (surveySetup == null)
+            {
+                surveySetup = new EventSurveySetup();
+            }
+            if (surveySetup.EventQuestionListModel == null)
+            {
+                surveySetup.EventQuestionListModel = new List<EventQuestionModel>();
+            }
+            
+            surveySetup.EventQuestionListModel = surveySetup.EventQuestionListModel
+                .Where(q => q != null)
+                .ToList();
+                
+            foreach (var question in surveySetup.EventQuestionListModel)
+            {
+                if (question.EventAnswerListModel == null)
+                {
+                    question.EventAnswerListModel = new List<EventAnswerModel>();
+                }
+
+                question.EventAnswerListModel = question.EventAnswerListModel
+                    .Where(a => a != null)
+                    .ToList();
+            }
+            
+            surveySetup.EventQuestionListModel = surveySetup.EventQuestionListModel
+                .Where(q => !string.IsNullOrWhiteSpace(q.Question) || (q.EventAnswerListModel != null && q.EventAnswerListModel.Any(a => !string.IsNullOrWhiteSpace(a.Answer))))
+                .ToList();
+            
+            foreach (var question in surveySetup.EventQuestionListModel)
+            {
+                question.EventAnswerListModel = question.EventAnswerListModel
+                    .Where(a => !string.IsNullOrWhiteSpace(a.Answer))
+                    .ToList();
+            }
+
+            // Edit and Create do the same thing since we delete and recreate all questions/answers
+            var validationResult = await _eventSurveySetupValidator.ValidateAsync(surveySetup);
+
+            if (!validationResult.IsValid)
+            {
+                foreach (var error in validationResult.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                
+                surveySetup.IsEdit = true;
+                return View("GuestQuestion", surveySetup);
+            }
+
+            await _eventModelFactory.InsertEventQuestionListAsync(surveySetup);
+
+            return RedirectToAction("GuestSetup", new { id = surveySetup.UserEventId });
         }
 
         [HttpGet]

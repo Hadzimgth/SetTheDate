@@ -95,7 +95,7 @@ namespace SetTheDate.Controllers
             return RedirectToAction("Login", "Home");
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult Logout()
         {
             // Clear all session data
