@@ -11,13 +11,15 @@ namespace SetTheDate.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserModelFactory _userModelFactory;
         private readonly EventModelFactory _eventModelFactory;
+        private readonly GuestModelFactory _guestModelFactory;
         private readonly IValidator<RegisterModel> _registerModelValidator;
 
-        public HomeController(ILogger<HomeController> logger, UserModelFactory userModelFactory, EventModelFactory eventModelFactory, IValidator<RegisterModel> registerModelValidator)
+        public HomeController(ILogger<HomeController> logger, UserModelFactory userModelFactory, EventModelFactory eventModelFactory, GuestModelFactory guestModelFactory, IValidator<RegisterModel> registerModelValidator)
         {
             _logger = logger;
             _userModelFactory = userModelFactory;
             _eventModelFactory = eventModelFactory;
+            _guestModelFactory = guestModelFactory;
             _registerModelValidator = registerModelValidator;
         }
 
@@ -159,6 +161,31 @@ namespace SetTheDate.Controllers
             var weddingCard = await _eventModelFactory.GetWeddingCardByIdAsync(weddingCardId);
 
             return View(weddingCard);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveGuestWish([FromBody] GuestWishesModel guestWish)
+        {
+            if (guestWish == null || string.IsNullOrWhiteSpace(guestWish.Name) || string.IsNullOrWhiteSpace(guestWish.Wish))
+            {
+                return Json(new { success = false, message = "Name and wish are required." });
+            }
+
+            if (guestWish.WeddingCardInformationId <= 0)
+            {
+                return Json(new { success = false, message = "Invalid wedding card ID." });
+            }
+
+            try
+            {
+                await _guestModelFactory.InsertGuestWishes(guestWish);
+                return Json(new { success = true, message = "Wish saved successfully!" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving guest wish");
+                return Json(new { success = false, message = "Error saving wish. Please try again." });
+            }
         }
     }
 }
