@@ -80,9 +80,9 @@
                                             <td>@item.GuestResponded</td>
                                             <td>@item.TotalGuest</td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="copyWeddingCardLink('@item.WeddingCardId', this)">
-                                                    Copy Link
-                                                </button>
+                                                <a href="/home/weddingcard?weddingCardId=@item.WeddingCardId" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    Open Wedding Card
+                                                </a>
                                             </td>
                                             <td>
                                                 @if (item.Status == "Ongoing")
@@ -111,27 +111,4 @@
             </div>
         </div>
     </div>
-    <script>
-        function copyWeddingCardLink(weddingCardId, btn) {
-
-            const url = `${window.location.origin}/home/weddingcard?weddingCardId=${weddingCardId}`;
-
-            navigator.clipboard.writeText(url).then(function () {
-
-                const originalText = btn.innerText;
-                btn.innerText = 'Copied ✓';
-                btn.classList.remove('btn-outline-primary');
-                btn.classList.add('btn-success');
-
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-outline-primary');
-                }, 2000);
-
-            }).catch(function () {
-                alert('Failed to copy link');
-            });
-        }
-    </script>
 </body>
