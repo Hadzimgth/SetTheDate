@@ -68,6 +68,13 @@ namespace SetTheDate.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(UserEventModel userEvent)
         {
+            // Check if event status is Completed - skip update if so
+            var existingEvent = await _eventModelFactory.GetEventByIdAsync(userEvent.Id);
+            if (existingEvent?.Status == "Completed")
+            {
+                return RedirectToAction("EventWeddingCardTemplate", new { id = userEvent.Id });
+            }
+
             var validationResult = await _userEventModelValidator.ValidateAsync(userEvent);
 
             if (!validationResult.IsValid)
@@ -94,6 +101,13 @@ namespace SetTheDate.Controllers
         public async Task<IActionResult> WeddingCardTemplateEdit(UserEventModel userEvent)
         {
             var weddingCard = await _eventModelFactory.GetWeddingCardByIdAsync(userEvent.WeddingCardId);
+            
+            // Check if event status is Completed - skip update if so
+            var existingEvent = await _eventModelFactory.GetEventByIdAsync(weddingCard.UserEventId);
+            if (existingEvent?.Status == "Completed")
+            {
+                return RedirectToAction("GuestQuestion", new { id = weddingCard.UserEventId });
+            }
 
             weddingCard.WeddingCardType = userEvent.WeddingCardType;
 
@@ -200,6 +214,16 @@ namespace SetTheDate.Controllers
         [HttpPost]
         public async Task<IActionResult> GuestQuestionEdit(EventSurveySetup surveySetup)
         {
+            // Check if event status is Completed - skip update if so
+            if (surveySetup != null && surveySetup.UserEventId > 0)
+            {
+                var existingEvent = await _eventModelFactory.GetEventByIdAsync(surveySetup.UserEventId);
+                if (existingEvent?.Status == "Completed")
+                {
+                    return RedirectToAction("GuestSetup", new { id = surveySetup.UserEventId });
+                }
+            }
+
             if (surveySetup == null)
             {
                 surveySetup = new EventSurveySetup();
@@ -321,6 +345,16 @@ namespace SetTheDate.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveGuestList(EventGuestListModel model)
         {
+            // Check if event status is Completed - skip update if so
+            if (model != null && model.UserEventId > 0)
+            {
+                var existingEvent = await _eventModelFactory.GetEventByIdAsync(model.UserEventId);
+                if (existingEvent?.Status == "Completed")
+                {
+                    return RedirectToAction("EventSetupSummary", new { id = model.UserEventId });
+                }
+            }
+
             if (model?.eventGuestList == null || !model.eventGuestList.Any())
             {
                 ModelState.AddModelError("", "No guest data to save.");
@@ -341,6 +375,7 @@ namespace SetTheDate.Controllers
             ViewBag.TotalGuest = userEvent?.TotalGuest ?? 0;
             ViewBag.QuestionCount = questionList?.Count ?? 0;
             ViewBag.EventId = id;
+            ViewBag.EventStatus = userEvent?.Status ?? "Draft";
 
             return View();
         }

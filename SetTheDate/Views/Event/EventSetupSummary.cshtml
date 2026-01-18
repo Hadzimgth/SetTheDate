@@ -17,14 +17,23 @@
             </div>
 
             <div class="d-flex justify-content-center gap-2">
-                <form method="post" action="@Url.Action("MakePayment", "Event")" style="display: inline;">
-                    <input type="hidden" name="id" value="@ViewBag.EventId" />
-                    <button type="submit" class="btn btn-dark px-4 py-2">Make Payment</button>
-                </form>
-                <a href="@Url.Action("Dashboard", "Home")"
-                   class="btn btn-warning px-4 py-2 text-dark">
-                    Draft
-                </a>
+                @if (ViewBag.EventStatus == "Completed")
+                {
+                    <a href="@Url.Action("Dashboard", "Home")" class="btn btn-dark px-4 py-2">
+                        Done
+                    </a>
+                }
+                else
+                {
+                    <form method="post" action="@Url.Action("MakePayment", "Event")" style="display: inline;">
+                        <input type="hidden" name="id" value="@ViewBag.EventId" />
+                        <button type="submit" class="btn btn-dark px-4 py-2">Make Payment</button>
+                    </form>
+                    <a href="@Url.Action("Dashboard", "Home")"
+                       class="btn btn-warning px-4 py-2 text-dark">
+                        Draft
+                    </a>
+                }
             </div>
         </div>
     </div>

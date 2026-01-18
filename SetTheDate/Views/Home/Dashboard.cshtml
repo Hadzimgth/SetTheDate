@@ -85,7 +85,7 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                @if (item.Status == "Ongoing")
+                                                @if (item.Status == "Ongoing" || item.Status == "Completed")
                                                 {
                                                     <a href="/Event/EventSummary?id=@item.Id" class="btn btn-sm btn-info text-white text-decoration-none">
                                                         View Summary
