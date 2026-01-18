@@ -95,7 +95,7 @@ namespace SetTheDate.Libraries.Services
                         // No more surveys to send - check if all surveys are completed and send thank you
                         if (guestSentData.Count > 0 && guestSentData.Count == eventSurveyList.Count)
                         {
-                            var allAnswersCompleted = guestSentData.All(x => x.EventAnswerId != 0 && x.EventAnswerId != 2);
+                            var allAnswersCompleted = guestSentData.All(x => x.EventAnswerId != 0);
                             
                             if (allAnswersCompleted)
                             {
@@ -118,9 +118,19 @@ namespace SetTheDate.Libraries.Services
                                 }
                             }
                         }
+
+                        var eventGuestAnswerFinal = new EventGuestAnswer
+                        {
+                            EventGuestId = guest.Id,
+                            EventQuestionId = 0,
+                            EventAnswerId = 0,
+                            UserEventId = eventId
+                        };
+
+                        await _guestService.TryInsertGuestAnswer(eventGuestAnswerFinal);
+
                         continue;
                     }
-
 
                     _logger.LogInformation("Saving basic response");
                     var eventGuestAnswer = new EventGuestAnswer
