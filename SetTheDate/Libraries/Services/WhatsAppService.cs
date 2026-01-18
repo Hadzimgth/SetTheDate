@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using SetTheDate.Libraries.Dtos;
-using SetTheDate.Libraries.Repositories;
+﻿using SetTheDate.Libraries.Dtos;
 using SetTheDate.Models;
 
 namespace SetTheDate.Libraries.Services
@@ -12,20 +9,26 @@ namespace SetTheDate.Libraries.Services
         public readonly GuestService _guestService;
         public readonly WasenderClient _wasenderClient;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<WhatsAppService> _logger;
 
-        public WhatsAppService(EventService eventService, GuestService guestService, WasenderClient wasenderClient, IConfiguration configuration)
+        public WhatsAppService(EventService eventService, GuestService guestService, WasenderClient wasenderClient, IConfiguration configuration, ILogger<WhatsAppService> logger)
         {
             _eventService = eventService;
             _guestService = guestService;
             _wasenderClient = wasenderClient;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task SendPendingSurveys(CancellationToken token)
         {
+
+            _logger.LogInformation("Finding Event");
             var eventList = (await _eventService.GetAllEventListAsync())
                 .Where(x => x.Status == "Ongoing" && x.EndDate > DateTime.Now)
                 .ToList();
+
+            _logger.LogInformation("Finding Event");
 
             foreach (var eventModel in eventList)
             {
@@ -33,9 +36,14 @@ namespace SetTheDate.Libraries.Services
 
                 var eventId = eventModel.Id;
 
+
+                _logger.LogInformation("Finding question");
                 var eventSurveyList = await _eventService.GetEventQuestionListByIdAsync(eventId);
                 if (!eventSurveyList.Any())
                     continue;
+
+
+                _logger.LogInformation("Found question");
 
                 var sentData = await _guestService.GetEventGuestAnswerByEventId(eventId);
                 var guestList = await _eventService.GetEventGuestListByIEventdAsync(eventId);
@@ -61,7 +69,7 @@ namespace SetTheDate.Libraries.Services
                     int nextSequence;
 
                     if (guestSentData.Count == 0)
-                        nextSequence = 1;
+                        nextSequence = 0;
                     else if (guestSentData.Count < eventSurveyList.Count)
                     {
                         nextSequence = guestSentData.Count + 1;
@@ -109,6 +117,8 @@ namespace SetTheDate.Libraries.Services
                         continue;
                     }
 
+
+                    _logger.LogInformation("Saving basic response");
                     var eventGuestAnswer = new EventGuestAnswer
                     {
                         EventGuestId = guest.Id,
@@ -119,7 +129,10 @@ namespace SetTheDate.Libraries.Services
 
                     var inserted = await _guestService.TryInsertGuestAnswer(eventGuestAnswer);
                     if (!inserted)
+                    {
+                        _logger.LogInformation("Failed to insert answer");
                         continue;
+                    }
                     var messageText = eventSurvey.Question;
 
                     var answerOptions = answers
@@ -135,10 +148,13 @@ namespace SetTheDate.Libraries.Services
                         );
                     }
 
+                    _logger.LogInformation("Sending message");
                     await _wasenderClient.SendMessage(
                         guest.PhoneNumber,
                         messageText
                     );
+
+                    _logger.LogInformation("Sending success");
                 }
             }
         }
