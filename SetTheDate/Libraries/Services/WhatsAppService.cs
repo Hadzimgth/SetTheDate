@@ -155,6 +155,11 @@ namespace SetTheDate.Libraries.Services
                     );
 
                     _logger.LogInformation("Sending success");
+
+                    var random = new Random();
+                    int delaySeconds = random.Next(10, 61);
+
+                    await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
                 }
             }
         }
