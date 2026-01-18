@@ -75,7 +75,7 @@ namespace SetTheDate.Libraries.Services
                         nextSequence = 0;
                     else if (guestSentData.Count < eventSurveyList.Count)
                     {
-                        nextSequence = guestSentData.Count + 1;
+                        nextSequence = guestSentData.Count;
 
                         var eventSurveyCheck = eventSurveyList
                             .FirstOrDefault(x => x.Sequence == guestSentData.Count - 1);
