@@ -10,14 +10,17 @@ namespace SetTheDate.Libraries.Services
         public readonly WasenderClient _wasenderClient;
         private readonly IConfiguration _configuration;
         private readonly ILogger<WhatsAppService> _logger;
+        private readonly SettingService _settingService;
 
-        public WhatsAppService(EventService eventService, GuestService guestService, WasenderClient wasenderClient, IConfiguration configuration, ILogger<WhatsAppService> logger)
+        public WhatsAppService(EventService eventService, GuestService guestService, WasenderClient wasenderClient, IConfiguration configuration, ILogger<WhatsAppService> logger,
+            SettingService settingService)
         {
             _eventService = eventService;
             _guestService = guestService;
             _wasenderClient = wasenderClient;
             _configuration = configuration;
             _logger = logger;
+            _settingService = settingService;
         }
 
         public async Task SendPendingSurveys(CancellationToken token)
@@ -76,7 +79,7 @@ namespace SetTheDate.Libraries.Services
 
                         var eventSurveyCheck = eventSurveyList
                             .FirstOrDefault(x => x.Sequence == guestSentData.Count);
-                        var checkAnswer = await _guestService.GetGuestanswerByGuestMobileNumberAndQuestionId(guest.PhoneNumber, eventSurveyCheck.Id);
+                        var checkAnswer = await _guestService.GetGuestanswerByGuestIdAndQuestionId(guest.Id, eventSurveyCheck.Id);
 
                         if (checkAnswer != null && checkAnswer.EventAnswerId == 0)
                             continue;
@@ -102,7 +105,8 @@ namespace SetTheDate.Libraries.Services
                                 if (weddingCard != null)
                                 {
                                     // Get base URL from configuration or use a default
-                                    var baseUrl = _configuration["AppSettings:BaseUrl"] ?? _configuration["AppSettings:BaseURL"] ?? "http://localhost:5123";
+                                    var baseUrl = (await _settingService.GetSettings()).FirstOrDefault(x => x.Name == "baseurl")?.Value ?? "";
+
                                     var weddingCardLink = $"{baseUrl.TrimEnd('/')}/home/weddingcard?weddingCardId={weddingCard.Id}";
                                     
                                     var thankYouMessage = "Thank you for participating in answering the questions. We greatly appreciate in your participation. In the meantime please visit the eWeddingCard for more information and or leave a wedding wish to them!\n\nVisit it here\n" + weddingCardLink;
