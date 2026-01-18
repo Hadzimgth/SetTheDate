@@ -95,10 +95,8 @@ namespace SetTheDate.Libraries.Services
             var eventGuestsAnswers = await _eventGuestAnswerRepository.GetAllAsync();
             return eventGuestsAnswers.Where(x => x.UserEventId == eventId).ToList();
         }
-        public async Task<EventGuestAnswer> GetGuestanswerByGuestMobileNumberAndQuestionId(string MobileNumber, int questionId)
+        public async Task<EventGuestAnswer> GetGuestanswerByGuestIdAndQuestionId(int guestId, int questionId)
         {
-            var guestId = (await _eventService.GetGuestByPhoneNumber(MobileNumber)).Id;
-
             var guestAnswers = await _eventGuestAnswerRepository.GetAllAsync();
             return guestAnswers.Where(x => x.EventGuestId == guestId && x.EventQuestionId == questionId).FirstOrDefault();
         }
