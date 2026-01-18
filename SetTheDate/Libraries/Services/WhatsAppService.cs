@@ -78,7 +78,7 @@ namespace SetTheDate.Libraries.Services
                         nextSequence = guestSentData.Count + 1;
 
                         var eventSurveyCheck = eventSurveyList
-                            .FirstOrDefault(x => x.Sequence == guestSentData.Count);
+                            .FirstOrDefault(x => x.Sequence == guestSentData.Count - 1);
                         var checkAnswer = await _guestService.GetGuestanswerByGuestIdAndQuestionId(guest.Id, eventSurveyCheck.Id);
 
                         if (checkAnswer != null && checkAnswer.EventAnswerId == 0)
