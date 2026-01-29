@@ -1,0 +1,120 @@
+@model List<SettingModel>
+
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div style="background-color:#a7c8ff; min-height:100vh;">
+    <div class="container py-4">
+        <div class="bg-white p-4 rounded-4 shadow-sm">
+            <h3 class="fw-bold mb-4">Settings</h3>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form asp-action="Save" asp-controller="Setting" method="post" id="settingsForm">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0" id="settingsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 40%;">Name</th>
+                                <th style="width: 50%;">Value</th>
+                                <th style="width: 10%;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="hidden" asp-for="@Model[i].Id" />
+                                        @if (Model[i].Id > 0)
+                                        {
+                                            <span class="form-control-plaintext">@Model[i].Name</span>
+                                            <input type="hidden" asp-for="@Model[i].Name" />
+                                        }
+                                        else
+                                        {
+                                            <input type="text" asp-for="@Model[i].Name" class="form-control" placeholder="Enter setting name" />
+                                        }
+                                    </td>
+                                    <td>
+                                        <input type="text" asp-for="@Model[i].Value" class="form-control" placeholder="Enter setting value" />
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-between">
+                    <button type="button" class="btn btn-primary" id="addRowBtn">Add New Row</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Add new row functionality
+            $('#addRowBtn').click(function () {
+                var index = $('#settingsTable tbody tr').length;
+                var newRow = $('<tr>')
+                    .append($('<td>').html(
+                        '<input type="hidden" name="[' + index + '].Id" value="0" />' +
+                        '<input type="text" name="[' + index + '].Name" class="form-control" placeholder="Enter setting name" />'
+                    ))
+                    .append($('<td>').html(
+                        '<input type="text" name="[' + index + '].Value" class="form-control" placeholder="Enter setting value" />'
+                    ))
+                    .append($('<td>').html(
+                        '<button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>'
+                    ));
+                $('#settingsTable tbody').append(newRow);
+            });
+
+            // Remove row functionality
+            $(document).on('click', '.remove-row', function () {
+                $(this).closest('tr').remove();
+                // Re-index the form inputs
+                reindexFormInputs();
+            });
+
+            function reindexFormInputs() {
+                $('#settingsTable tbody tr').each(function (index) {
+                    $(this).find('input').each(function () {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            // Replace the index in the name attribute
+                            var newName = name.replace(/\[\d+\]/, '[' + index + ']');
+                            $(this).attr('name', newName);
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+}
+
