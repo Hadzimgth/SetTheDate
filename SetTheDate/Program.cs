@@ -81,6 +81,7 @@ builder.Services.AddScoped<UserModelFactory>();
 builder.Services.AddScoped<GuestModelFactory>();
 builder.Services.AddScoped<EventModelFactory>();
 builder.Services.AddScoped<AttachmentModelFactory>();
+builder.Services.AddScoped<SettingModelFactory>();
 
 //validator
 builder.Services.AddValidatorsFromAssemblyContaining<ContactInformationModelValidator>();

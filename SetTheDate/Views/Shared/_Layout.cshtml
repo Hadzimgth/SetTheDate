@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -26,6 +28,16 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Dashboard">Home</a>
                         </li>
+                        @if (bool.TryParse(Context.Session.GetString("UserIsAdmin"), out var isAdmin) && isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white"
+                                   asp-controller="Setting"
+                                   asp-action="Index">
+                                    Settings
+                                </a>
+                            </li>
+                        }
                     </ul>
 
                     <!-- Right-side dropdowns -->

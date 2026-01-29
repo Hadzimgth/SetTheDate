@@ -21,5 +21,24 @@ namespace SetTheDate.Libraries.Services
             return await _settingRepository.GetAllAsync();
         }
 
+        public async Task<Setting> InsertSetting(Setting setting)
+        {
+            _settingRepository.Add(setting);
+            await _context.SaveChangesAsync();
+            return setting;
+        }
+
+        public async Task<Setting> UpdateSetting(Setting setting)
+        {
+            _settingRepository.Update(setting);
+            await _context.SaveChangesAsync();
+            return setting;
+        }
+
+        public async Task<Setting> GetSettingById(int id)
+        {
+            return await _settingRepository.GetByIdAsync(id);
+        }
+
     }
 }
