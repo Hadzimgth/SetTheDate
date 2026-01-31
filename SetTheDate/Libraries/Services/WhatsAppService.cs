@@ -179,7 +179,6 @@ namespace SetTheDate.Libraries.Services
         }
 
 
-
         public async Task SaveGuestResponse(WebhookPayload webhookPayload)
         {
             try
@@ -223,6 +222,21 @@ namespace SetTheDate.Libraries.Services
                     );
 
                     return;
+                }
+
+                var allGuestAnswers = await _guestService.GetEventGuestAnswerByEventId(eventId);
+                var guestPreviousAnswers = allGuestAnswers
+                    .Where(x => x.EventGuestId == eventGuestAnswer.EventGuestId && x.EventAnswerId != 0)
+                    .ToList();
+
+                if (!guestPreviousAnswers.Any())
+                {
+                    var userEvent = await _eventService.GetEventByIdAsync(eventId);
+                    if (userEvent != null)
+                    {
+                        userEvent.GuestResponded = userEvent.GuestResponded + 1;
+                        await _eventService.UpdateEvent(userEvent);
+                    }
                 }
 
                 eventGuestAnswer.EventAnswerId = validAnswers.Id;
