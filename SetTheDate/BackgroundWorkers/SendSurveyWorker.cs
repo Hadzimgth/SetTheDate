@@ -28,7 +28,7 @@ namespace SetTheDate.BackgroundWorkers
         {
             _logger.LogInformation("SendSurveyWorker started");
 
-            using var timer = new PeriodicTimer(TimeSpan.FromMinutes(5));
+            using var timer = new PeriodicTimer(TimeSpan.FromMinutes(2));
 
             await RunOnceAsync(stoppingToken);
 

@@ -301,7 +301,7 @@ namespace SetTheDate.ModelFactories
             var existingGuestAnswers = await _eventService.GetGuestAnswerListByEventIdAsync(surveySetup.UserEventId);
             foreach (var guestAnswer in existingGuestAnswers)
             {
-                await _eventService.DeleteGeestAnswer(guestAnswer);
+                await _eventService.DeleteGuestAnswer(guestAnswer);
             }
 
             var existingAnswers = await _eventService.GetEventAnswerListByEventIdAsync(surveySetup.UserEventId);

@@ -215,7 +215,7 @@ namespace SetTheDate.Libraries.Services
             _eventGuestAnswerRepository.Add(answer);
             await _context.SaveChangesAsync();
         }
-        public async Task DeleteGeestAnswer(EventGuestAnswer answer)
+        public async Task DeleteGuestAnswer(EventGuestAnswer answer)
         {
             _eventGuestAnswerRepository.Delete(answer); 
             await _context.SaveChangesAsync();
