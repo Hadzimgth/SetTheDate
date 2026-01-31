@@ -229,7 +229,7 @@ namespace SetTheDate.Libraries.Services
                     .Where(x => x.EventGuestId == eventGuestAnswer.EventGuestId && x.EventAnswerId != 0)
                     .ToList();
 
-                if (!guestPreviousAnswers.Any())
+                if (guestPreviousAnswers.Count == 1 && guestPreviousAnswers.FirstOrDefault().EventAnswerId != 0)
                 {
                     var userEvent = await _eventService.GetEventByIdAsync(eventId);
                     if (userEvent != null)
